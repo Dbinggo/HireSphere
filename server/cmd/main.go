@@ -10,7 +10,7 @@ import (
 func main() {
 	log.InitLogger()
 	configs.InitConfig()
-	databases.InitMySql()
+	databases.InitDataBase()
 	myRedis.InitMyRedis()
 
 }

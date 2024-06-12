@@ -14,7 +14,7 @@ type Mysql struct {
 
 // InitMySql 初始化
 func (m *Mysql) InitDataBases() error {
-	dsn := m.GetDsn()
+	dsn := m.getDsn()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: log.MyLogger,
 	})
@@ -31,6 +31,6 @@ func (m *Mysql) InitDataBases() error {
 	logrus.Infof("数据库连接成功！")
 	return nil
 }
-func (m *Mysql) GetDsn() string {
+func (m *Mysql) getDsn() string {
 	return configs.Conf.Dsn
 }
