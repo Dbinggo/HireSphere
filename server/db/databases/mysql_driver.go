@@ -1,7 +1,6 @@
-package mySql
+package databases
 
 import (
-	"fmt"
 	"github.com/Dbinggo/HireSphere/server/configs"
 	"github.com/Dbinggo/HireSphere/server/internal/Model"
 	"github.com/Dbinggo/HireSphere/server/log"
@@ -10,25 +9,28 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+type Mysql struct {
+}
 
 // InitMySql 初始化
-func InitMySql() {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", configs.Conf.MySqlConfig.UserName, configs.Conf.MySqlConfig.Password, configs.Conf.MySqlConfig.Host, configs.Conf.MySqlConfig.Port, configs.Conf.MySqlConfig.DBName)
+func (m *Mysql) InitDataBases() error {
+	dsn := m.GetDsn()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: log.MyLogger,
 	})
 	if err != nil {
 		logrus.Fatalf("无法连接数据库！: %v", err)
-		return
+		return err
 	}
 	err = db.AutoMigrate(Model.User{})
 	if err != nil {
 		logrus.Fatalf("无法迁移数据库！: %v", err)
-		return
+		return err
 	}
-	DB = db
 
 	logrus.Infof("数据库连接成功！")
-
+	return nil
+}
+func (m *Mysql) GetDsn() string {
+	return configs.Conf.Dsn
 }

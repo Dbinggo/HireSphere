@@ -24,6 +24,7 @@ type DB struct {
 	Dsn    string `mapstructure:"dsn"`
 }
 type RedisConfig struct {
+	Enable   bool   `mapstructure:"enable"`
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
 	Password string `mapstructure:"password"`

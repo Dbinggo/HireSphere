@@ -3,6 +3,7 @@ database:
   dsn: root:xufeng@tcp(10.120.83.18:3306)/func-go?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms
 
 redis:
+  enable: true
   host: localhost
   port: 6379
   password: myredispassword

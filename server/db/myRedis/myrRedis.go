@@ -1,10 +1,13 @@
 package myRedis
 
 import (
+	"context"
 	"fmt"
 	"github.com/Dbinggo/HireSphere/server/configs"
 	"github.com/Dbinggo/HireSphere/server/global"
 	"github.com/go-redis/redis/v8"
+	"github.com/sirupsen/logrus"
+	"log"
 )
 
 const (
@@ -12,7 +15,11 @@ const (
 )
 
 func InitMyRedis() {
-	global.Redis = redis.NewClient(&redis.Options{
+	if configs.Conf.RedisConfig.Enable {
+		logrus.Info("do not need redis")
+		return
+	}
+	client := redis.NewClient(&redis.Options{
 		Network:            "",
 		Addr:               fmt.Sprintf(redisAddr, configs.Conf.RedisConfig.Host, configs.Conf.RedisConfig.Port),
 		Dialer:             nil,
@@ -36,4 +43,10 @@ func InitMyRedis() {
 		TLSConfig:          nil,
 		Limiter:            nil,
 	})
+	if _, err := client.Ping(context.Background()).Result(); err != nil {
+		logrus.Fatal("redis cant connect")
+	} else {
+		log.Println("init redis")
+		global.Redis = client
+	}
 }
