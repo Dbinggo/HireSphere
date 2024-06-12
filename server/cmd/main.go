@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/Dbinggo/HireSphere/server/configs"
-	"github.com/Dbinggo/HireSphere/server/internal/db/myRedis"
-	"github.com/Dbinggo/HireSphere/server/internal/db/mySql"
+	"github.com/Dbinggo/HireSphere/server/db/myRedis"
+	"github.com/Dbinggo/HireSphere/server/db/mySql"
 	"github.com/Dbinggo/HireSphere/server/log"
 )
 

@@ -27,7 +27,7 @@ func InitMyRedis() {
 		ReadTimeout:        0,
 		WriteTimeout:       0,
 		PoolFIFO:           false,
-		PoolSize:           10,
+		PoolSize:           1000,
 		MinIdleConns:       1,
 		MaxConnAge:         0,
 		PoolTimeout:        0,

@@ -15,16 +15,13 @@ const DefaultConfigPath = "./config.yaml"
 var Conf = new(Config)
 
 type Config struct {
-	MySqlConfig `mapstructure:"mysql"`
+	DB          `mapstructure:"database"`
 	RedisConfig `mapstructure:"redis"`
 }
 
-type MySqlConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
-	UserName string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
-	DBName   string `mapstructure:"dbname"`
+type DB struct {
+	Driver string `mapstructure:"driver"`
+	Dsn    string `mapstructure:"dsn"`
 }
 type RedisConfig struct {
 	Host     string `mapstructure:"host"`
@@ -59,13 +56,12 @@ func InitConfig() {
 			panic(fmt.Sprintf("failed at init config: %v", err))
 		}
 		// 如果有环境变量就覆盖，适用于本地开发使用文件，实际运行使用环境变量的场景
-		DBHost := os.Getenv("DB_HOST")
-		if DBHost != "" {
-			Conf.MySqlConfig.Host = DBHost
-		}
-		DBPassword := os.Getenv("DB_PASSWORD")
-		if DBPassword != "" {
-			Conf.MySqlConfig.Password = DBPassword
+		DBDriver := os.Getenv("DRIVER")
+		DBDsn := os.Getenv("DSN")
+		if DBDriver != "" && DBDsn != "" {
+			Conf.DB.Driver = DBDriver
+			Conf.DB.Dsn = DBDsn
+
 		}
 		RedisHost := os.Getenv("REDIS_HOST")
 		if RedisHost != "" {
@@ -89,13 +85,12 @@ func InitConfig() {
 	}
 
 	// 如果有环境变量就覆盖，适用于本地开发使用文件，实际运行使用环境变量的场景
-	DBHost := os.Getenv("DB_HOST")
-	if DBHost != "" {
-		Conf.MySqlConfig.Host = DBHost
-	}
-	DBPassword := os.Getenv("DB_PASSWORD")
-	if DBPassword != "" {
-		Conf.MySqlConfig.Password = DBPassword
+	DBDriver := os.Getenv("DRIVER")
+	DBDsn := os.Getenv("DSN")
+	if DBDriver != "" && DBDsn != "" {
+		Conf.DB.Driver = DBDriver
+		Conf.DB.Dsn = DBDsn
+
 	}
 	RedisHost := os.Getenv("REDIS_HOST")
 	if RedisHost != "" {

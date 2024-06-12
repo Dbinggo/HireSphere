@@ -1,9 +1,6 @@
-mysql:
-  host: 123.207.73.185
-  port: 13306
-  username: root
-  password: hehehe1..
-  dbname: mydatabase
+database:
+  driver: mysql
+  dsn: root:xufeng@tcp(10.120.83.18:3306)/func-go?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms
 
 redis:
   host: localhost
