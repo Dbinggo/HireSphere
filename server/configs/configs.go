@@ -5,19 +5,21 @@ const DefaultConfigPath = "./config.yaml"
 var Conf = new(Config)
 
 type Config struct {
-	App ApplicationConfig `mapstructure:"app"`
-	Log LoggerConfig      `mapstructure:"log"`
-	DB  DBConfig          `mapstructure:"database"`
-	Rdb RedisConfig       `mapstructure:"redis"`
+	App   ApplicationConfig `mapstructure:"app"`
+	Log   LoggerConfig      `mapstructure:"log"`
+	DB    DBConfig          `mapstructure:"database"`
+	Redis RedisConfig       `mapstructure:"redis"`
 }
 
 type ApplicationConfig struct {
-	Port int `mapstructure:"port"`
+	Port int    `mapstructure:"port"`
+	Env  string `mapstructure:"env"`
 }
 type LoggerConfig struct {
 	Level    int8   `mapstructure:"level"`
 	Format   string `mapstructure:"format"`
 	Director string `mapstructure:"director"`
+	ShowLine bool   `mapstructure:"show-line"`
 }
 
 type DBConfig struct {

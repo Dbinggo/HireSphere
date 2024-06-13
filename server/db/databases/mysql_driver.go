@@ -10,7 +10,7 @@ import (
 type Mysql struct {
 }
 
-// InitMySql 初始化
+// InitDataBases 初始化
 func (m *Mysql) InitDataBases() (*gorm.DB, error) {
 	dsn := m.getDsn()
 	db, err := gorm.Open(mysql.Open(dsn))

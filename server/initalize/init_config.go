@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/Dbinggo/HireSphere/server/configs"
+	"github.com/Dbinggo/HireSphere/server/global"
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -26,11 +27,12 @@ func InitConfig() {
 	viper.WatchConfig()
 	// 观察配置文件变动
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		logrus.Printf("config file has changed")
+		logrus.Printf("配置文件发生变化")
 		if err := viper.Unmarshal(&configs.Conf); err != nil {
 			logrus.Fatalf("failed at unmarshal config file after change, err: %v", err)
 		}
 		logrus.Infof("%+v", configs.Conf)
+		global.Config = configs.Conf
 	})
 	// 将配置文件读入 viper
 	if err := viper.ReadInConfig(); err != nil {
@@ -43,4 +45,6 @@ func InitConfig() {
 		panic(fmt.Sprintf("failed at init config: %v", err))
 	}
 	logrus.Infof("%+v", configs.Conf)
+	global.Config = configs.Conf
+
 }

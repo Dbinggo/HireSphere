@@ -15,8 +15,6 @@ import (
 	"time"
 )
 
-var MyLogger *MyLoggerStruct
-
 func InitLogger() {
 	hook := NewLfsHook(utils.GetRootPath("log/logfiles/api.log"), nil, 10)
 	logrus.AddHook(hook)
@@ -26,7 +24,7 @@ func InitLogger() {
 	logrus.SetLevel(logrus.DebugLevel)
 
 	logrus.Debugln("[INIT] init log success")
-	MyLogger = &MyLoggerStruct{Logger: logrus.New()}
+
 }
 
 func formatter(isConsole bool) *nested.Formatter {

@@ -15,7 +15,7 @@ const (
 )
 
 func InitMyRedis() {
-	if configs.Conf.Redis.Enable {
+	if global.Config.Redis.Enable {
 		logrus.Info("do not need redis")
 		return
 	}
@@ -47,6 +47,6 @@ func InitMyRedis() {
 		logrus.Fatal("redis cant connect")
 	} else {
 		log.Println("init redis")
-		global.Redis = client
+		global.Rdb = client
 	}
 }
