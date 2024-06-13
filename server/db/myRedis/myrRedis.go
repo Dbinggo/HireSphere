@@ -15,18 +15,18 @@ const (
 )
 
 func InitMyRedis() {
-	if configs.Conf.RedisConfig.Enable {
+	if configs.Conf.Redis.Enable {
 		logrus.Info("do not need redis")
 		return
 	}
 	client := redis.NewClient(&redis.Options{
 		Network:            "",
-		Addr:               fmt.Sprintf(redisAddr, configs.Conf.RedisConfig.Host, configs.Conf.RedisConfig.Port),
+		Addr:               fmt.Sprintf(redisAddr, configs.Conf.Redis.Host, configs.Conf.Redis.Port),
 		Dialer:             nil,
 		OnConnect:          nil,
 		Username:           "",
-		Password:           configs.Conf.RedisConfig.Password,
-		DB:                 configs.Conf.RedisConfig.DB,
+		Password:           configs.Conf.Redis.Password,
+		DB:                 configs.Conf.Redis.DB,
 		MaxRetries:         0,
 		MinRetryBackoff:    0,
 		MaxRetryBackoff:    0,
