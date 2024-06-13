@@ -4,6 +4,8 @@ import (
 	"github.com/Dbinggo/HireSphere/server/global"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"os"
 	"time"
 )
 
@@ -13,66 +15,103 @@ import (
 
 func GetZap() *zap.Logger {
 	var logger *zap.Logger
-	var z zapConfig
-
+	var cores = make([]zapcore.Core, 0)
 	switch global.Config.App.Env {
 	case "pro":
-		logger, _ = zap.NewProduction()
+		//本开发模式旨在将正常信息及以上的log记录在文件中，方便查看
+		fileInfoCore := newZapConfig().
+			setEncoder(false, zapcore.NewConsoleEncoder).
+			setFileWriteSyncer(global.LOG_INFO_LOG_PATH).
+			setStdOutWriteSyncer().
+			setLevelEnabler(zapcore.DebugLevel).
+			getCore()
+		//本开发模式旨在将error及以上的log记录在文件中，方便查看
+		fileErrorCore := newZapConfig().
+			setEncoder(false, zapcore.NewConsoleEncoder).
+			setFileWriteSyncer(global.LOG_ERR_LOG_PATH).
+			setLevelEnabler(zapcore.ErrorLevel).
+			getCore()
+		cores = append(cores, fileInfoCore, fileErrorCore)
 	case "dev":
 	default:
-		logger = zap.New(*z.Core, z.Options...)
+		consoleInfoCore := newZapConfig().
+			setEncoder(true, zapcore.NewConsoleEncoder).
+			setStdOutWriteSyncer().
+			setLevelEnabler(zapcore.DebugLevel).
+			getCore()
+		cores = append(cores, consoleInfoCore)
 	}
+	logger = zap.New(zapcore.NewTee(cores...), zap.AddCaller())
 	defer logger.Sync()
 	return logger
 }
 
 type zapConfig struct {
-	Core         *zapcore.Core
-	Encoder      *zapcore.Encoder
-	WriteSyncer  *zapcore.WriteSyncer
-	LevelEnabler *zapcore.LevelEnabler
-	Options      []zap.Option
+	core             zapcore.Core
+	encoder          zapcore.Encoder
+	writeSyncerSlice []zapcore.WriteSyncer
+	levelEnabler     zapcore.LevelEnabler
+}
+
+func newZapConfig() *zapConfig {
+	return &zapConfig{
+		writeSyncerSlice: make([]zapcore.WriteSyncer, 0),
+	}
 }
 
 // 定制core
-func (z *zapConfig) setCore() *zapConfig {
-	*z.Core = zapcore.NewCore(*z.Encoder, *z.WriteSyncer, *z.LevelEnabler)
-	return z
+func (z *zapConfig) getCore() zapcore.Core {
+	z.core = zapcore.NewCore(z.encoder, zapcore.NewMultiWriteSyncer(z.writeSyncerSlice...), z.levelEnabler)
+	return z.core
 }
 
-// Encoder 是编码器，以什么样的格式写入日志。
+// encoder 是编码器，以什么样的格式写入日志。
 // 目前，zap只支持两种编码器——JSON Encoder和Console Encoder
-func (z *zapConfig) setEncoder(encoder func(cfg zapcore.EncoderConfig) zapcore.Encoder) *zapConfig {
-	*z.Encoder = encoder(zapcore.EncoderConfig{
-		MessageKey:          "message",
-		LevelKey:            "level",
-		TimeKey:             "time",
-		NameKey:             "name",
-		CallerKey:           "caller",
-		FunctionKey:         "function",
-		StacktraceKey:       "stacktrace",
-		SkipLineEnding:      false,
-		EncodeName:          nil,
-		NewReflectedEncoder: nil,
-		ConsoleSeparator:    "\t",
-
+// 储存在日志中的文件就不要颜色了
+func (z *zapConfig) setEncoder(needColour bool, encoder func(cfg zapcore.EncoderConfig) zapcore.Encoder) *zapConfig {
+	encodeLevel := zapcore.CapitalLevelEncoder
+	if needColour {
+		encodeLevel = zapcore.CapitalColorLevelEncoder
+	}
+	z.encoder = encoder(zapcore.EncoderConfig{
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "name",
+		CallerKey:      "caller",
+		FunctionKey:    zapcore.OmitKey,
+		MessageKey:     "message",
+		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalColorLevelEncoder, //大写彩色
+		EncodeLevel:    encodeLevel,
 		EncodeTime:     newTimeEncoder(),
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder, // path/file
+		EncodeDuration: zapcore.StringDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
 	})
+
 	return z
 }
 
-func (z *zapConfig) setWriteSyncer() *zapConfig {
+func (z *zapConfig) setFileWriteSyncer(logFilePath string) *zapConfig {
+	//引入第三方库 Lumberjack 加入日志切割功能
+	lumberWriteSyncer := &lumberjack.Logger{
+		Filename:   logFilePath,
+		MaxSize:    10,    // megabytes
+		MaxBackups: 100,   //最多备份文件数量
+		MaxAge:     28,    // days
+		Compress:   false, //Compress确定是否应该使用gzip压缩已旋转的日志文件。默认值是不执行压缩。
+	}
+	z.writeSyncerSlice = append(z.writeSyncerSlice, zapcore.AddSync(lumberWriteSyncer))
+
 	return z
 }
-func (z *zapConfig) setLevelEnabler(enabler zapcore.LevelEnabler) *zapConfig {
-	*z.LevelEnabler = enabler
+func (z *zapConfig) setStdOutWriteSyncer() *zapConfig {
+	z.writeSyncerSlice = append(z.writeSyncerSlice, zapcore.AddSync(os.Stdout))
 	return z
 }
-func (z *zapConfig) setOptions() *zapConfig {
+func (z *zapConfig) setLevelEnabler(enabler zapcore.Level) *zapConfig {
+	z.levelEnabler = zap.LevelEnablerFunc(func(lev zapcore.Level) bool { //error级别
+		return lev >= enabler
+	})
 	return z
 }
 

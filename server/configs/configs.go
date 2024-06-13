@@ -1,7 +1,5 @@
 package configs
 
-const DefaultConfigPath = "./config.yaml"
-
 var Conf = new(Config)
 
 type Config struct {
@@ -36,6 +34,6 @@ type RedisConfig struct {
 }
 
 type KafkaConfig struct {
-	host string `yaml:"host"`
-	port int    `yaml:"port"`
+	host string `mapstructure:"host"`
+	port int    `mapstructure:"port"`
 }
