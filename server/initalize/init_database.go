@@ -14,14 +14,16 @@ func InitDataBase() {
 		mysql := &databases.Mysql{}
 		db, err := mysql.InitDataBases()
 		if err != nil {
-			logrus.Fatal("mysql数据库初始化失败！")
+			global.Log.Panic("mysql数据库初始化失败！")
 		}
 		global.DB = db
 		break
 	}
-	err := global.DB.AutoMigrate()
-	if err != nil {
-		logrus.Fatal("数据库迁移失败！")
+	if global.Config.App.Env != "pro" {
+		err := global.DB.AutoMigrate()
+		if err != nil {
+			logrus.Fatal("数据库迁移失败！")
+		}
 	}
-
+	global.Log.Info("数据库初始化成功！")
 }

@@ -8,6 +8,8 @@ import (
 )
 
 var (
+	//跟目录下
+	Path   string
 	DB     *gorm.DB
 	Rdb    *redis.Client
 	Config *configs.Config

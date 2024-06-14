@@ -18,7 +18,7 @@ func InitConfig() {
 
 	// 默认配置文件路径
 	var configPath string
-	flag.StringVar(&configPath, "c", global.DEFAULT_CONFIG_FILE_PATH, "配置文件绝对路径或相对路径")
+	flag.StringVar(&configPath, "c", global.Path+global.DEFAULT_CONFIG_FILE_PATH, "配置文件绝对路径或相对路径")
 	flag.Parse()
 	logrus.Printf("===> config path is: %s", configPath)
 	// 初始化配置文件

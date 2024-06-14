@@ -16,31 +16,31 @@ import (
 func GetZap() *zap.Logger {
 	var logger *zap.Logger
 	var cores = make([]zapcore.Core, 0)
-	switch global.Config.App.Env {
-	case "pro":
-		//本开发模式旨在将正常信息及以上的log记录在文件中，方便查看
-		fileInfoCore := newZapConfig().
-			setEncoder(false, zapcore.NewConsoleEncoder).
-			setFileWriteSyncer(global.LOG_INFO_LOG_PATH).
-			setStdOutWriteSyncer().
-			setLevelEnabler(zapcore.DebugLevel).
-			getCore()
-		//本开发模式旨在将error及以上的log记录在文件中，方便查看
-		fileErrorCore := newZapConfig().
-			setEncoder(false, zapcore.NewConsoleEncoder).
-			setFileWriteSyncer(global.LOG_ERR_LOG_PATH).
-			setLevelEnabler(zapcore.ErrorLevel).
-			getCore()
-		cores = append(cores, fileInfoCore, fileErrorCore)
-	case "dev":
-	default:
-		consoleInfoCore := newZapConfig().
-			setEncoder(true, zapcore.NewConsoleEncoder).
-			setStdOutWriteSyncer().
-			setLevelEnabler(zapcore.DebugLevel).
-			getCore()
-		cores = append(cores, consoleInfoCore)
-	}
+	//switch global.Config.App.Env {
+	//case "pro":
+	//本开发模式旨在将正常信息及以上的log记录在文件中，方便查看
+	fileInfoCore := newZapConfig().
+		setEncoder(false, zapcore.NewConsoleEncoder).
+		setFileWriteSyncer(global.Path + global.LOG_INFO_LOG_PATH).
+		setStdOutWriteSyncer().
+		setLevelEnabler(zapcore.DebugLevel).
+		getCore()
+	//本开发模式旨在将error及以上的log记录在文件中，方便查看
+	fileErrorCore := newZapConfig().
+		setEncoder(false, zapcore.NewConsoleEncoder).
+		setFileWriteSyncer(global.Path + global.LOG_ERR_LOG_PATH).
+		setLevelEnabler(zapcore.ErrorLevel).
+		getCore()
+	cores = append(cores, fileInfoCore, fileErrorCore)
+	//case "dev":
+	//default:
+	//	consoleInfoCore := newZapConfig().
+	//		setEncoder(true, zapcore.NewConsoleEncoder).
+	//		setStdOutWriteSyncer().
+	//		setLevelEnabler(zapcore.DebugLevel).
+	//		getCore()
+	//	cores = append(cores, consoleInfoCore)
+	//}
 	logger = zap.New(zapcore.NewTee(cores...), zap.AddCaller())
 	defer logger.Sync()
 	return logger
