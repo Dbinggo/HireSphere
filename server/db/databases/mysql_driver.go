@@ -2,7 +2,7 @@ package databases
 
 import (
 	"github.com/Dbinggo/HireSphere/server/configs"
-	"github.com/sirupsen/logrus"
+	"github.com/Dbinggo/HireSphere/server/global"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -15,10 +15,10 @@ func (m *Mysql) InitDataBases() (*gorm.DB, error) {
 	dsn := m.getDsn()
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
-		logrus.Fatalf("无法连接数据库！: %v", err)
+		global.Logger.Panic("无法连接数据库！: %v", err)
 		return nil, err
 	}
-	logrus.Infof("数据库连接成功！")
+	global.Logger.Info("数据库连接成功！")
 	return db, nil
 }
 func (m *Mysql) getDsn() string {

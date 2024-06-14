@@ -8,5 +8,4 @@ import (
 func InitLog() {
 	logger := log.GetZap()
 	global.Logger = logger.Sugar()
-	global.Logger.Info("path is ", global.Path)
 }

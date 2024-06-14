@@ -6,7 +6,6 @@ import (
 	"github.com/Dbinggo/HireSphere/server/configs"
 	"github.com/Dbinggo/HireSphere/server/global"
 	"github.com/go-redis/redis/v8"
-	"github.com/sirupsen/logrus"
 	"log"
 )
 
@@ -16,7 +15,7 @@ const (
 
 func InitMyRedis() {
 	if global.Config.Redis.Enable {
-		logrus.Info("do not need redis")
+		global.Logger.Warnf("不使用redis模式")
 		return
 	}
 	client := redis.NewClient(&redis.Options{
@@ -44,7 +43,7 @@ func InitMyRedis() {
 		Limiter:            nil,
 	})
 	if _, err := client.Ping(context.Background()).Result(); err != nil {
-		logrus.Fatal("redis cant connect")
+		global.Logger.Fatal("redis cant connect")
 	} else {
 		log.Println("init redis")
 		global.Rdb = client

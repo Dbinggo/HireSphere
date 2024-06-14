@@ -1,6 +1,11 @@
+app:
+  port: 8080
+  env: dev
+
 database:
   driver: mysql
-  dsn: root:xufeng@tcp(10.120.83.18:3306)/func-go?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms
+  migrate: true
+  dsn: fortest:test@tcp(123.207.73.185:3307)/fortest?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms
 
 redis:
   enable: true

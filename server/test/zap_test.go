@@ -25,9 +25,8 @@ var (
 )
 
 func TestLog(t *testing.T) {
-	initalize.Init()
 	global.Config.App.Env = "pro"
-
+	initalize.InitPath()
 	log := log2.GetZap()
 	global.Logger = log.Sugar()
 	for i := 0; i < 10000; i++ {

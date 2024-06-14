@@ -4,7 +4,6 @@ import (
 	"github.com/Dbinggo/HireSphere/server/configs"
 	"github.com/Dbinggo/HireSphere/server/db/databases"
 	"github.com/Dbinggo/HireSphere/server/global"
-	"github.com/sirupsen/logrus"
 )
 
 func InitDataBase() {
@@ -22,7 +21,7 @@ func InitDataBase() {
 	if global.Config.App.Env != "pro" {
 		err := global.DB.AutoMigrate()
 		if err != nil {
-			logrus.Fatal("数据库迁移失败！")
+			global.Logger.Panic("数据库迁移失败！")
 		}
 	}
 	global.Logger.Info("数据库初始化成功！")

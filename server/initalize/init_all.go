@@ -6,10 +6,11 @@ import (
 )
 
 func Init() {
+	InitLog()
 	InitPath()
 	InitConfig()
 	InitLog()
-	//InitDataBase()
+	InitDataBase()
 }
 func InitPath() {
 	global.Path = utils.GetRootPath("")
