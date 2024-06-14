@@ -14,7 +14,7 @@ func InitDataBase() {
 		mysql := &databases.Mysql{}
 		db, err := mysql.InitDataBases()
 		if err != nil {
-			global.Log.Panic("mysql数据库初始化失败！")
+			global.Logger.Panic("mysql数据库初始化失败！")
 		}
 		global.DB = db
 		break
@@ -25,5 +25,5 @@ func InitDataBase() {
 			logrus.Fatal("数据库迁移失败！")
 		}
 	}
-	global.Log.Info("数据库初始化成功！")
+	global.Logger.Info("数据库初始化成功！")
 }

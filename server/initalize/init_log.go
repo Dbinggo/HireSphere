@@ -7,6 +7,6 @@ import (
 
 func InitLog() {
 	logger := log.GetZap()
-	global.Log = logger.Sugar()
-	global.Log.Info("path is ", global.Path)
+	global.Logger = logger.Sugar()
+	global.Logger.Info("path is ", global.Path)
 }

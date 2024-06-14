@@ -29,10 +29,10 @@ func TestLog(t *testing.T) {
 	global.Config.App.Env = "pro"
 
 	log := log2.GetZap()
-	global.Log = log.Sugar()
+	global.Logger = log.Sugar()
 	for i := 0; i < 10000; i++ {
-		global.Log.Info(testLog + fmt.Sprintf(",i=%d", i))
-		global.Log.Error(testLog + fmt.Sprintf(",i=%d", i))
+		global.Logger.Info(testLog + fmt.Sprintf(",i=%d", i))
+		global.Logger.Error(testLog + fmt.Sprintf(",i=%d", i))
 	}
 
 }
