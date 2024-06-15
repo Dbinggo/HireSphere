@@ -11,6 +11,7 @@ func Init() {
 	InitConfig()
 	InitLog()
 	InitDataBase()
+	InitRedis()
 }
 func InitPath() {
 	global.Path = utils.GetRootPath("")

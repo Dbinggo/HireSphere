@@ -6,17 +6,16 @@ import (
 	"github.com/Dbinggo/HireSphere/server/configs"
 	"github.com/Dbinggo/HireSphere/server/global"
 	"github.com/go-redis/redis/v8"
-	"log"
 )
 
 const (
 	redisAddr = "%s:%d"
 )
 
-func InitMyRedis() {
-	if global.Config.Redis.Enable {
-		global.Logger.Warnf("不使用redis模式")
-		return
+func GetRedisClient() (*redis.Client, error) {
+	if !global.Config.Redis.Enable {
+		global.Logger.Warnf("不使用Redis模式")
+		return nil, nil
 	}
 	client := redis.NewClient(&redis.Options{
 		Network:            "",
@@ -43,9 +42,8 @@ func InitMyRedis() {
 		Limiter:            nil,
 	})
 	if _, err := client.Ping(context.Background()).Result(); err != nil {
-		global.Logger.Fatal("redis cant connect")
-	} else {
-		log.Println("init redis")
-		global.Rdb = client
+		global.Logger.Fatalf("redis无法链接 %v", err)
+		return nil, err
 	}
+	return client, nil
 }

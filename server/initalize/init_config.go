@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// TODO 可以添加环境变量 环境变量没有加在上面 单纯觉得有点用不到
 func InitConfig() {
 	// 初始化时间为东八区的时间
 	var cstZone = time.FixedZone("CST", 8*3600) // 东八
