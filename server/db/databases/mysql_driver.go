@@ -11,16 +11,19 @@ type Mysql struct {
 }
 
 // InitDataBases 初始化
-func (m *Mysql) InitDataBases() (*gorm.DB, error) {
-	dsn := m.getDsn()
+func (m *Mysql) initDataBases(config configs.Config) (*gorm.DB, error) {
+	dsn := m.getDsn(config)
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
-		global.Logger.Panic("无法连接数据库！: %v", err)
+		global.Logger.Panic("MySQL无法连接数据库！: %v", err)
 		return nil, err
 	}
-	global.Logger.Info("数据库连接成功！")
+	global.Logger.Info("MySQL连接数据库成功！")
 	return db, nil
 }
-func (m *Mysql) getDsn() string {
-	return configs.Conf.DB.Dsn
+func (m *Mysql) getDsn(config configs.Config) string {
+	return config.DB.Dsn
+}
+func NewMySql() DataBase {
+	return &Mysql{}
 }

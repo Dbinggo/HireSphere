@@ -14,13 +14,13 @@ import (
 [感谢伟人 让我彻底搞懂 zap]https://juejin.cn/post/7313979344561242162?searchId=20240613163846377BACC6CC0FB80CC369
 */
 
-func GetZap() *zap.Logger {
+func GetZap(config *configs.Config) *zap.Logger {
 	var logger *zap.Logger
 	var cores = make([]zapcore.Core, 0)
-	if global.Config == nil {
-		global.Config = new(configs.Config)
+	if config == nil {
+		config = new(configs.Config)
 	}
-	switch global.Config.App.Env {
+	switch config.App.Env {
 	case "pro":
 		//本开发模式旨在将正常信息及以上的log记录在文件中，方便查看
 		fileInfoCore := newZapConfig().
@@ -36,6 +36,7 @@ func GetZap() *zap.Logger {
 			getCore()
 		cores = append(cores, fileInfoCore, fileErrorCore)
 	case "dev":
+		//输出在控制台
 		consoleInfoCore := newZapConfig().
 			setEncoder(true, zapcore.NewConsoleEncoder).
 			setStdOutWriteSyncer().
@@ -43,6 +44,7 @@ func GetZap() *zap.Logger {
 			getCore()
 		cores = append(cores, consoleInfoCore)
 	default:
+		//默认开发模式
 		consoleInfoCore := newZapConfig().
 			setEncoder(true, zapcore.NewConsoleEncoder).
 			setStdOutWriteSyncer().

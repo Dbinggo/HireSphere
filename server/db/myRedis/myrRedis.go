@@ -12,8 +12,8 @@ const (
 	redisAddr = "%s:%d"
 )
 
-func GetRedisClient() (*redis.Client, error) {
-	if !global.Config.Redis.Enable {
+func GetRedisClient(config configs.Config) (*redis.Client, error) {
+	if !config.Redis.Enable {
 		global.Logger.Warnf("不使用Redis模式")
 		return nil, nil
 	}

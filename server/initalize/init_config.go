@@ -31,6 +31,7 @@ func InitConfig() {
 		}
 		global.Logger.Debugf("%+v", configs.Conf)
 		global.Config = configs.Conf
+		Init()
 	})
 	// 将配置文件读入 viper
 	if err := viper.ReadInConfig(); err != nil {

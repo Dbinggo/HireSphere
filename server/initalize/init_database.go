@@ -7,19 +7,13 @@ import (
 	"github.com/Dbinggo/HireSphere/server/global"
 )
 
-func InitDataBase() {
-	conf := configs.Conf.DB
-	switch conf.Driver {
+func InitDataBase(config configs.Config) {
+	switch config.DB.Driver {
 	case "mysql":
-		mysql := &databases.Mysql{}
-		db, err := mysql.InitDataBases()
-		if err != nil {
-			global.Logger.Panic("mysql数据库初始化失败！")
-		}
-		global.DB = db
+		databases.InitDataBases(databases.NewMySql(), config)
 		break
 	}
-	if global.Config.App.Env != "pro" {
+	if config.App.Env != "pro" {
 		err := global.DB.AutoMigrate()
 		if err != nil {
 			global.Logger.Panic("数据库迁移失败！")
@@ -27,10 +21,10 @@ func InitDataBase() {
 	}
 	global.Logger.Info("数据库初始化成功！")
 }
-func InitRedis() {
-	if global.Config.Redis.Enable {
+func InitRedis(config configs.Config) {
+	if config.Redis.Enable {
 		var err error
-		global.Rdb, err = myRedis.GetRedisClient()
+		global.Rdb, err = myRedis.GetRedisClient(config)
 		if err != nil {
 			global.Logger.Errorf("无法初始化Redis : %v", err)
 		}

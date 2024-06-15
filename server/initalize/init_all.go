@@ -6,12 +6,12 @@ import (
 )
 
 func Init() {
-	InitLog()
+	InitLog(global.Config)
 	InitPath()
 	InitConfig()
-	InitLog()
-	InitDataBase()
-	InitRedis()
+	InitLog(global.Config)
+	InitDataBase(*global.Config)
+	InitRedis(*global.Config)
 }
 func InitPath() {
 	global.Path = utils.GetRootPath("")
