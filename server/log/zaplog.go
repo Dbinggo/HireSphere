@@ -95,7 +95,7 @@ func (z *zapConfig) setEncoder(needColour bool, encoder func(cfg zapcore.Encoder
 		EncodeLevel:    encodeLevel,
 		EncodeTime:     newTimeEncoder(),
 		EncodeDuration: zapcore.StringDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
+		EncodeCaller:   zapcore.FullCallerEncoder,
 	})
 
 	return z
