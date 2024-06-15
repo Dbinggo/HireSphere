@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Dbinggo/HireSphere/server/configs"
-	"github.com/Dbinggo/HireSphere/server/global"
+	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -14,7 +14,7 @@ const (
 
 func GetRedisClient(config configs.Config) (*redis.Client, error) {
 	if !config.Redis.Enable {
-		global.Logger.Warnf("不使用Redis模式")
+		zlog.Warnf("不使用Redis模式")
 		return nil, nil
 	}
 	client := redis.NewClient(&redis.Options{
@@ -42,7 +42,7 @@ func GetRedisClient(config configs.Config) (*redis.Client, error) {
 		Limiter:            nil,
 	})
 	if _, err := client.Ping(context.Background()).Result(); err != nil {
-		global.Logger.Fatalf("redis无法链接 %v", err)
+		zlog.Fatalf("redis无法链接 %v", err)
 		return nil, err
 	}
 	return client, nil

@@ -10,8 +10,9 @@ type Config struct {
 }
 
 type ApplicationConfig struct {
-	Port int    `mapstructure:"port"`
-	Env  string `mapstructure:"env"`
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port" :"port"`
+	Env  string `mapstructure:"env" :"env"`
 }
 type LoggerConfig struct {
 	Level    int8   `mapstructure:"level"`

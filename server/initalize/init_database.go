@@ -5,6 +5,7 @@ import (
 	"github.com/Dbinggo/HireSphere/server/db/databases"
 	"github.com/Dbinggo/HireSphere/server/db/myRedis"
 	"github.com/Dbinggo/HireSphere/server/global"
+	"github.com/Dbinggo/HireSphere/server/log/zlog"
 )
 
 func InitDataBase(config configs.Config) {
@@ -16,20 +17,20 @@ func InitDataBase(config configs.Config) {
 	if config.App.Env != "pro" {
 		err := global.DB.AutoMigrate()
 		if err != nil {
-			global.Logger.Panic("数据库迁移失败！")
+			zlog.Fatalf("数据库迁移失败！")
 		}
 	}
-	global.Logger.Info("数据库初始化成功！")
+	zlog.Infof("数据库初始化成功！")
 }
 func InitRedis(config configs.Config) {
 	if config.Redis.Enable {
 		var err error
 		global.Rdb, err = myRedis.GetRedisClient(config)
 		if err != nil {
-			global.Logger.Errorf("无法初始化Redis : %v", err)
+			zlog.Errorf("无法初始化Redis : %v", err)
 		}
 	} else {
-		global.Logger.Warn("不使用Redis")
+		zlog.Warnf("不使用Redis")
 	}
 
 }

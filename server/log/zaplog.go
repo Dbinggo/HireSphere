@@ -53,7 +53,7 @@ func GetZap(config *configs.Config) *zap.Logger {
 		cores = append(cores, consoleInfoCore)
 
 	}
-	logger = zap.New(zapcore.NewTee(cores...), zap.AddCaller())
+	logger = zap.New(zapcore.NewTee(cores...), zap.AddCaller(), zap.AddCallerSkip(1))
 	defer logger.Sync()
 	return logger
 }
