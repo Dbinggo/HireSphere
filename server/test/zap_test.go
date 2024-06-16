@@ -2,9 +2,9 @@ package test
 
 import (
 	"fmt"
-	"github.com/Dbinggo/HireSphere/server/global"
-	"github.com/Dbinggo/HireSphere/server/initalize"
+	"github.com/Dbinggo/HireSphere/server/configs"
 	log2 "github.com/Dbinggo/HireSphere/server/log"
+	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"testing"
 )
 
@@ -25,13 +25,13 @@ var (
 )
 
 func TestLog(t *testing.T) {
-	global.Config.App.Env = "pro"
-	initalize.InitPath()
-	log := log2.GetZap()
-	global.Logger = log.Sugar()
+	conf := new(configs.Config)
+	conf.App.Env = "pro"
+	log := log2.GetZap(conf)
+	zlog.InitLogger(log)
 	for i := 0; i < 10000; i++ {
-		global.Logger.Info(testLog + fmt.Sprintf(",i=%d", i))
-		global.Logger.Error(testLog + fmt.Sprintf(",i=%d", i))
+		zlog.Infof(testLog + fmt.Sprintf(",i=%d", i))
+		zlog.Errorf(testLog + fmt.Sprintf(",i=%d", i))
 	}
 
 }

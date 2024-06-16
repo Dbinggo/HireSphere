@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Dbinggo/HireSphere/server/global"
 	"github.com/Dbinggo/HireSphere/server/initalize"
+	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"testing"
 )
 
@@ -15,5 +16,5 @@ func TestRedis(T *testing.T) {
 	v2 := global.Rdb.Get(context.Background(), "test_redis")
 	global.Rdb.Set(context.Background(), "test_redis", "3333", 0)
 	v3 := global.Rdb.Get(context.Background(), "test_redis")
-	global.Logger.Info(v1, v2, v3)
+	zlog.Infof("%v,%v,%v", v1, v2, v3)
 }
