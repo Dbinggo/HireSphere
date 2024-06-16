@@ -14,10 +14,9 @@ import (
 /*
 [感谢伟人 让我彻底搞懂 zap]https://juejin.cn/post/7313979344561242162?searchId=20240613163846377BACC6CC0FB80CC369
 */
-
-func GetZap(config *configs.Config) *hertzzap.Logger {
-	var logger *hertzzap.Logger
+func GetLogger(config *configs.Config) (*zap.Logger, *hertzzap.Logger) {
 	var coreConfigs = make([]zapConfig, 0)
+	var cors = make([]zapcore.Core, 0)
 	if config == nil {
 		config = new(configs.Config)
 	}
@@ -29,13 +28,16 @@ func GetZap(config *configs.Config) *hertzzap.Logger {
 			setFileWriteSyncer(global.Path + config.App.LogfilePath + "info.log").
 			setLevelEnabler(zapcore.DebugLevel).
 			getConfig()
+		fileInfoCore := fileInfoConfig.getCore()
 		//本开发模式旨在将error及以上的log记录在文件中，方便查看
 		fileErrorConfig := newZapConfig().
 			setEncoder(false, zapcore.NewConsoleEncoder).
 			setFileWriteSyncer(global.Path + config.App.LogfilePath + "error.log").
 			setLevelEnabler(zapcore.ErrorLevel).
 			getConfig()
+		fileErrorCore := fileErrorConfig.getCore()
 		coreConfigs = append(coreConfigs, fileInfoConfig, fileErrorConfig)
+		cors = append(cors, fileInfoCore, fileErrorCore)
 	case "dev":
 		//输出在控制台
 		consoleInfoConfig := newZapConfig().
@@ -43,7 +45,9 @@ func GetZap(config *configs.Config) *hertzzap.Logger {
 			setStdOutWriteSyncer().
 			setLevelEnabler(zapcore.DebugLevel).
 			getConfig()
+		consoleInfoCore := consoleInfoConfig.getCore()
 		coreConfigs = append(coreConfigs, consoleInfoConfig)
+		cors = append(cors, consoleInfoCore)
 	default:
 		//默认开发模式
 		consoleInfoConfig := newZapConfig().
@@ -51,9 +55,23 @@ func GetZap(config *configs.Config) *hertzzap.Logger {
 			setStdOutWriteSyncer().
 			setLevelEnabler(zapcore.DebugLevel).
 			getConfig()
+		consoleInfoCore := consoleInfoConfig.getCore()
 		coreConfigs = append(coreConfigs, consoleInfoConfig)
+		cors = append(cors, consoleInfoCore)
 
 	}
+	zapLogger := makeZapLogger(cors, zap.AddCaller(), zap.AddCallerSkip(1))
+	hertzLogger := makeHertzZapLogger(coreConfigs)
+	defer zapLogger.Sync()
+	defer hertzLogger.Sync()
+	return zapLogger, hertzLogger
+}
+func makeZapLogger(cors []zapcore.Core, options ...zap.Option) *zap.Logger {
+	core := zapcore.NewTee(cors...)
+	return zap.New(core, options...)
+
+}
+func makeHertzZapLogger(coreConfigs []zapConfig, zapOptions ...zap.Option) *hertzzap.Logger {
 	var options []hertzzap.Option
 	for _, coreConfig := range coreConfigs {
 		options = append(options, hertzzap.WithCoreEnc(coreConfig.getEncoder()))
@@ -62,9 +80,8 @@ func GetZap(config *configs.Config) *hertzzap.Logger {
 		}
 		options = append(options, hertzzap.WithCoreLevel(zap.NewAtomicLevelAt(zap.DebugLevel)))
 	}
-	options = append(options, hertzzap.WithZapOptions())
-	logger = hertzzap.NewLogger(options...)
-	defer logger.Sync()
+	options = append(options, hertzzap.WithZapOptions(zapOptions...))
+	logger := hertzzap.NewLogger(options...)
 	return logger
 }
 

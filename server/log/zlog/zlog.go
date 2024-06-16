@@ -3,7 +3,7 @@ package zlog
 import (
 	"context"
 	"fmt"
-	hertzzap "github.com/hertz-contrib/logger/zap"
+	"go.uber.org/zap"
 
 	"go.uber.org/zap/zapcore"
 )
@@ -11,8 +11,9 @@ import (
 type logKey string
 
 const loggerKey logKey = "logger"
+const loggerTraceIdKey logKey = "traceId"
 
-var logger *hertzzap.Logger
+var logger *zap.Logger
 
 // NewContext
 //
@@ -21,19 +22,22 @@ var logger *hertzzap.Logger
 //	@param fields
 //	@return context.Context
 func NewContext(ctx context.Context, fields ...zapcore.Field) context.Context {
-	return context.WithValue(ctx, loggerKey, withContext(ctx))
+	return context.WithValue(ctx, loggerKey, withContext(ctx).With(fields...))
 }
-
-func InitLogger(zapLogger *hertzzap.Logger) {
+func NewTraceIdContext(ctx context.Context, traceId string) context.Context {
+	ctx = context.WithValue(ctx, loggerKey, withContext(ctx))
+	return context.WithValue(ctx, loggerTraceIdKey, traceId)
+}
+func InitLogger(zapLogger *zap.Logger) {
 	logger = zapLogger
 }
 
 // 从指定的context返回一个zap实例
-func withContext(ctx context.Context) *hertzzap.Logger {
+func withContext(ctx context.Context) *zap.Logger {
 	if ctx == nil {
 		return logger
 	}
-	if ctxLogger, ok := ctx.Value(loggerKey).(*hertzzap.Logger); ok {
+	if ctxLogger, ok := ctx.Value(loggerKey).(*zap.Logger); ok {
 		return ctxLogger
 	}
 	return logger
@@ -88,3 +92,7 @@ func CtxPanicf(ctx context.Context, format string, v ...interface{}) {
 func CtxFatalf(ctx context.Context, format string, v ...interface{}) {
 	withContext(ctx).Fatal(fmt.Sprintf(format, v...))
 }
+
+//func TraceInfof(ctx context.Context, format string, v ...interface{}) {
+//	logger.Info(ctx.Value(loggerTraceIdKey).(string), fmt.Sprintf(format, v...))
+//}

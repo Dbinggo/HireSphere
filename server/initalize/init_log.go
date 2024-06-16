@@ -8,7 +8,7 @@ import (
 )
 
 func InitLog(config *configs.Config) {
-	logger := log.GetZap(config)
-	zlog.InitLogger(logger)
-	hlog.SetLogger(logger)
+	zapLogger, hertzLogger := log.GetLogger(config)
+	zlog.InitLogger(zapLogger)
+	hlog.SetLogger(hertzLogger)
 }
