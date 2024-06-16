@@ -3,8 +3,8 @@ package zlog
 import (
 	"context"
 	"fmt"
+	hertzzap "github.com/hertz-contrib/logger/zap"
 
-	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -12,7 +12,7 @@ type logKey string
 
 const loggerKey logKey = "logger"
 
-var logger *zap.Logger
+var logger *hertzzap.Logger
 
 // NewContext
 //
@@ -21,19 +21,19 @@ var logger *zap.Logger
 //	@param fields
 //	@return context.Context
 func NewContext(ctx context.Context, fields ...zapcore.Field) context.Context {
-	return context.WithValue(ctx, loggerKey, withContext(ctx).With(fields...))
+	return context.WithValue(ctx, loggerKey, withContext(ctx))
 }
 
-func InitLogger(zapLogger *zap.Logger) {
+func InitLogger(zapLogger *hertzzap.Logger) {
 	logger = zapLogger
 }
 
 // 从指定的context返回一个zap实例
-func withContext(ctx context.Context) *zap.Logger {
+func withContext(ctx context.Context) *hertzzap.Logger {
 	if ctx == nil {
 		return logger
 	}
-	if ctxLogger, ok := ctx.Value(loggerKey).(*zap.Logger); ok {
+	if ctxLogger, ok := ctx.Value(loggerKey).(*hertzzap.Logger); ok {
 		return ctxLogger
 	}
 	return logger
@@ -56,7 +56,7 @@ func Debugf(format string, v ...interface{}) {
 }
 
 func Panicf(format string, v ...interface{}) {
-	logger.Panic(fmt.Sprintf(format, v...))
+	logger.Fatal(fmt.Sprintf(format, v...))
 }
 
 func Fatalf(format string, v ...interface{}) {
@@ -82,7 +82,7 @@ func CtxDebugf(ctx context.Context, format string, v ...interface{}) {
 }
 
 func CtxPanicf(ctx context.Context, format string, v ...interface{}) {
-	withContext(ctx).Panic(fmt.Sprintf(format, v...))
+	withContext(ctx).Fatal(fmt.Sprintf(format, v...))
 }
 
 func CtxFatalf(ctx context.Context, format string, v ...interface{}) {

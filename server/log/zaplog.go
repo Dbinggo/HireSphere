@@ -3,6 +3,7 @@ package log
 import (
 	"github.com/Dbinggo/HireSphere/server/configs"
 	"github.com/Dbinggo/HireSphere/server/global"
+	hertzzap "github.com/hertz-contrib/logger/zap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -14,46 +15,55 @@ import (
 [感谢伟人 让我彻底搞懂 zap]https://juejin.cn/post/7313979344561242162?searchId=20240613163846377BACC6CC0FB80CC369
 */
 
-func GetZap(config *configs.Config) *zap.Logger {
-	var logger *zap.Logger
-	var cores = make([]zapcore.Core, 0)
+func GetZap(config *configs.Config) *hertzzap.Logger {
+	var logger *hertzzap.Logger
+	var coreConfigs = make([]zapConfig, 0)
 	if config == nil {
 		config = new(configs.Config)
 	}
 	switch config.App.Env {
 	case "pro":
 		//本开发模式旨在将正常信息及以上的log记录在文件中，方便查看
-		fileInfoCore := newZapConfig().
+		fileInfoConfig := newZapConfig().
 			setEncoder(false, zapcore.NewConsoleEncoder).
 			setFileWriteSyncer(global.Path + config.App.LogfilePath + "info.log").
 			setLevelEnabler(zapcore.DebugLevel).
-			getCore()
+			getConfig()
 		//本开发模式旨在将error及以上的log记录在文件中，方便查看
-		fileErrorCore := newZapConfig().
+		fileErrorConfig := newZapConfig().
 			setEncoder(false, zapcore.NewConsoleEncoder).
 			setFileWriteSyncer(global.Path + config.App.LogfilePath + "error.log").
 			setLevelEnabler(zapcore.ErrorLevel).
-			getCore()
-		cores = append(cores, fileInfoCore, fileErrorCore)
+			getConfig()
+		coreConfigs = append(coreConfigs, fileInfoConfig, fileErrorConfig)
 	case "dev":
 		//输出在控制台
-		consoleInfoCore := newZapConfig().
+		consoleInfoConfig := newZapConfig().
 			setEncoder(true, zapcore.NewConsoleEncoder).
 			setStdOutWriteSyncer().
 			setLevelEnabler(zapcore.DebugLevel).
-			getCore()
-		cores = append(cores, consoleInfoCore)
+			getConfig()
+		coreConfigs = append(coreConfigs, consoleInfoConfig)
 	default:
 		//默认开发模式
-		consoleInfoCore := newZapConfig().
+		consoleInfoConfig := newZapConfig().
 			setEncoder(true, zapcore.NewConsoleEncoder).
 			setStdOutWriteSyncer().
 			setLevelEnabler(zapcore.DebugLevel).
-			getCore()
-		cores = append(cores, consoleInfoCore)
+			getConfig()
+		coreConfigs = append(coreConfigs, consoleInfoConfig)
 
 	}
-	logger = zap.New(zapcore.NewTee(cores...), zap.AddCaller(), zap.AddCallerSkip(1))
+	var options []hertzzap.Option
+	for _, coreConfig := range coreConfigs {
+		options = append(options, hertzzap.WithCoreEnc(coreConfig.getEncoder()))
+		for _, ws := range coreConfig.getWriteSyncers() {
+			options = append(options, hertzzap.WithCoreWs(ws))
+		}
+		options = append(options, hertzzap.WithCoreLevel(zap.NewAtomicLevelAt(zap.DebugLevel)))
+	}
+	options = append(options, hertzzap.WithZapOptions())
+	logger = hertzzap.NewLogger(options...)
 	defer logger.Sync()
 	return logger
 }
@@ -69,6 +79,9 @@ func newZapConfig() *zapConfig {
 	return &zapConfig{
 		writeSyncerSlice: make([]zapcore.WriteSyncer, 0),
 	}
+}
+func (z *zapConfig) getConfig() zapConfig {
+	return *z
 }
 
 // 定制core
@@ -102,7 +115,9 @@ func (z *zapConfig) setEncoder(needColour bool, encoder func(cfg zapcore.Encoder
 
 	return z
 }
-
+func (z zapConfig) getEncoder() zapcore.Encoder {
+	return z.encoder
+}
 func (z *zapConfig) setFileWriteSyncer(logFilePath string) *zapConfig {
 	//引入第三方库 Lumberjack 加入日志切割功能
 	lumberWriteSyncer := &lumberjack.Logger{
@@ -116,10 +131,17 @@ func (z *zapConfig) setFileWriteSyncer(logFilePath string) *zapConfig {
 
 	return z
 }
+func (z zapConfig) getWriteSyncers() []zapcore.WriteSyncer {
+	return z.writeSyncerSlice
+}
 func (z *zapConfig) setStdOutWriteSyncer() *zapConfig {
 	z.writeSyncerSlice = append(z.writeSyncerSlice, zapcore.AddSync(os.Stdout))
 	return z
 }
+func (z zapConfig) getLevelEnabler() zapcore.LevelEnabler {
+	return z.levelEnabler
+}
+
 func (z *zapConfig) setLevelEnabler(enabler zapcore.Level) *zapConfig {
 	z.levelEnabler = zap.LevelEnablerFunc(func(lev zapcore.Level) bool { //error级别
 		return lev >= enabler

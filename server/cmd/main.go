@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/Dbinggo/HireSphere/server/initalize"
-	"github.com/Dbinggo/HireSphere/server/internal/routerh"
+	"github.com/Dbinggo/HireSphere/server/internal/router"
 	"github.com/Dbinggo/HireSphere/server/log/zlog"
 )
 
