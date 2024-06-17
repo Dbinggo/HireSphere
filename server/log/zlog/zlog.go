@@ -11,7 +11,10 @@ import (
 type logKey string
 
 const loggerKey = "logger"
-const loggerTraceIdKey = "traceId"
+const loggerExKey = "loggerEx"
+
+// 分隔符
+const formatSeparator = "%v\t"
 
 var myLogger struct {
 	*zap.Logger
@@ -34,8 +37,11 @@ func NewContext(ctx context.Context, fields ...zapcore.Field) context.Context {
 		return context.WithValue(ctx, loggerKey, withContext(ctx).With(fields...))
 	} else {
 		ctx = context.WithValue(ctx, loggerKey, withContext(ctx))
-		if len(fields) == 1 && fields[0].Key == loggerTraceIdKey {
-			ctx = context.WithValue(ctx, loggerTraceIdKey, fields[0].String)
+		if ex, ok := ctx.Value(loggerExKey).([]zapcore.Field); ok {
+			ex = append(ex, fields...)
+			context.WithValue(ctx, loggerExKey, ex)
+		} else {
+			ctx = context.WithValue(ctx, loggerExKey, fields)
 		}
 		return ctx
 	}
@@ -80,15 +86,18 @@ func Fatalf(format string, v ...interface{}) {
 	logger.Fatal(fmt.Sprintf(format, v...))
 }
 
-func addTraceId(ctx context.Context, format string, v []interface{}) (string, []interface{}) {
+func addExField(ctx context.Context, format string, v []interface{}) (string, []interface{}) {
 	if formatJson() {
 		return format, v
 	} else {
-		if traceId, ok := ctx.Value(loggerTraceIdKey).(string); ok {
+		if exField, ok := ctx.Value(loggerExKey).([]zap.Field); ok {
 			_v := make([]interface{}, 0)
-			_v = append(_v, traceId)
+			for _, field := range exField {
+				_v = append(_v, field.String)
+				format = formatSeparator + format
+			}
 			_v = append(_v, v...)
-			return "%s \t" + format, _v
+			v = _v
 		}
 		return format, v
 	}
@@ -97,32 +106,32 @@ func addTraceId(ctx context.Context, format string, v []interface{}) (string, []
 // 下面的logger方法会携带trace id
 
 func CtxInfof(ctx context.Context, format string, v ...interface{}) {
-	format, v = addTraceId(ctx, format, v)
+	format, v = addExField(ctx, format, v)
 	withContext(ctx).Info(fmt.Sprintf(format, v...))
 }
 
 func CtxErrorf(ctx context.Context, format string, v ...interface{}) {
-	format, v = addTraceId(ctx, format, v)
+	format, v = addExField(ctx, format, v)
 	withContext(ctx).Error(fmt.Sprintf(format, v...))
 }
 
 func CtxWarnf(ctx context.Context, format string, v ...interface{}) {
-	format, v = addTraceId(ctx, format, v)
+	format, v = addExField(ctx, format, v)
 	withContext(ctx).Warn(fmt.Sprintf(format, v...))
 }
 
 func CtxDebugf(ctx context.Context, format string, v ...interface{}) {
-	format, v = addTraceId(ctx, format, v)
+	format, v = addExField(ctx, format, v)
 	withContext(ctx).Debug(fmt.Sprintf(format, v...))
 }
 
 func CtxPanicf(ctx context.Context, format string, v ...interface{}) {
-	format, v = addTraceId(ctx, format, v)
+	format, v = addExField(ctx, format, v)
 	withContext(ctx).Panic(fmt.Sprintf(format, v...))
 }
 
 func CtxFatalf(ctx context.Context, format string, v ...interface{}) {
-	format, v = addTraceId(ctx, format, v)
+	format, v = addExField(ctx, format, v)
 	withContext(ctx).Fatal(fmt.Sprintf(format, v...))
 }
 
