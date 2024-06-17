@@ -3,6 +3,7 @@ package zlog
 import (
 	"context"
 	"fmt"
+	"github.com/Dbinggo/HireSphere/server/global"
 	"go.uber.org/zap"
 
 	"go.uber.org/zap/zapcore"
@@ -13,7 +14,15 @@ type logKey string
 const loggerKey logKey = "logger"
 const loggerTraceIdKey logKey = "traceId"
 
+var myLogger struct {
+	*zap.Logger
+	TraceId string
+}
 var logger *zap.Logger
+
+func formatJson() bool {
+	return global.Config.App.Env == "json"
+}
 
 // NewContext
 //

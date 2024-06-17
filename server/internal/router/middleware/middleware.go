@@ -24,7 +24,7 @@ func AddTraceId() app.HandlerFunc {
 		if traceID == "" {
 			traceID = uuid.New().String()
 		}
-		c = zlog.NewContext(c, zap.String("", traceID))
+		c = zlog.NewContext(c, zap.String("traceId", traceID))
 		ctx.Next(c)
 	}
 }
