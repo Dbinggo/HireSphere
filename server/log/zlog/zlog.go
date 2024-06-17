@@ -6,6 +6,7 @@ import (
 	"github.com/Dbinggo/HireSphere/server/global"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"runtime"
 )
 
 type logKey string
@@ -87,20 +88,24 @@ func Fatalf(format string, v ...interface{}) {
 }
 
 func addExField(ctx context.Context, format string, v []interface{}) (string, []interface{}) {
-	if formatJson() {
-		return format, v
-	} else {
+	if !formatJson() {
+		_v := make([]interface{}, 0)
+		formatPre := ""
 		if exField, ok := ctx.Value(loggerExKey).([]zap.Field); ok {
-			_v := make([]interface{}, 0)
 			for _, field := range exField {
 				_v = append(_v, field.String)
-				format = formatSeparator + format
+				formatPre = formatPre + formatSeparator
 			}
-			_v = append(_v, v...)
-			v = _v
 		}
-		return format, v
+		format = formatPre + "%s:%d\t" + format
+		_, file, line, _ := runtime.Caller(2)
+		formatPre += format
+		_v = append(_v, file, line)
+		_v = append(_v, v...)
+		v = _v
 	}
+	return format, v
+
 }
 
 // 下面的logger方法会携带trace id

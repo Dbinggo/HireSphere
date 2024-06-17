@@ -68,7 +68,7 @@ func GetLogger(config *configs.Config) (*zap.Logger, *hertzzap.Logger) {
 		cors = append(cors, consoleInfoCore)
 
 	}
-	zapLogger := makeZapLogger(cors, zap.AddCaller(), zap.AddCallerSkip(1))
+	zapLogger := makeZapLogger(cors, zap.AddCallerSkip(1))
 	hertzLogger := makeHertzZapLogger(coreConfigs)
 	defer zapLogger.Sync()
 	defer hertzLogger.Sync()
