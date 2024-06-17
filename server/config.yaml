@@ -2,7 +2,9 @@ app:
   port: 8081
   host: ""
   env: dev
-  logfiles: /logs
+log:
+  format: console
+  director: /logs
 
 database:
   driver: mysql

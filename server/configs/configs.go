@@ -10,13 +10,12 @@ type Config struct {
 }
 
 type ApplicationConfig struct {
-	Host        string `mapstructure:"host"`
-	Port        int    `mapstructure:"port"`
-	Env         string `mapstructure:"env"`
-	LogfilePath string `mapstructure:"logfilePath"`
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
+	Env  string `mapstructure:"env"`
 }
 type LoggerConfig struct {
-	Level    int8   `mapstructure:"level"`
+	//Level    int8   `mapstructure:"level"`
 	Format   string `mapstructure:"format"`
 	Director string `mapstructure:"director"`
 	ShowLine bool   `mapstructure:"show-line"`
