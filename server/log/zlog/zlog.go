@@ -17,14 +17,13 @@ const loggerExKey = "loggerEx"
 // 分隔符
 const formatSeparator = "%v\t"
 
-var myLogger struct {
-	*zap.Logger
-	TraceId string
-}
 var logger *zap.Logger
 
 func formatJson() bool {
-	return global.Config.App.Env == "json"
+	if global.Config == nil {
+		return false
+	}
+	return global.Config.Log.Format == "json"
 }
 
 // NewContext
@@ -64,39 +63,39 @@ func withContext(ctx context.Context) *zap.Logger {
 }
 
 func Infof(format string, v ...interface{}) {
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(logger)
 	v = append(vCaller, v...)
-	logger.Info(fmt.Sprintf(formatCaller+format, v...))
+	_logger.Info(fmt.Sprintf(formatCaller+format, v...))
 }
 
 func Errorf(format string, v ...interface{}) {
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(logger)
 	v = append(vCaller, v...)
-	logger.Error(fmt.Sprintf(formatCaller+format, v...))
+	_logger.Error(fmt.Sprintf(formatCaller+format, v...))
 }
 
 func Warnf(format string, v ...interface{}) {
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(logger)
 	v = append(vCaller, v...)
-	logger.Warn(fmt.Sprintf(formatCaller+format, v...))
+	_logger.Warn(fmt.Sprintf(formatCaller+format, v...))
 }
 
 func Debugf(format string, v ...interface{}) {
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(logger)
 	v = append(vCaller, v...)
-	logger.Debug(fmt.Sprintf(formatCaller+format, v...))
+	_logger.Debug(fmt.Sprintf(formatCaller+format, v...))
 }
 
 func Panicf(format string, v ...interface{}) {
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(logger)
 	v = append(vCaller, v...)
-	logger.Panic(fmt.Sprintf(formatCaller+format, v...))
+	_logger.Panic(fmt.Sprintf(formatCaller+format, v...))
 }
 
 func Fatalf(format string, v ...interface{}) {
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(logger)
 	v = append(vCaller, v...)
-	logger.Fatal(fmt.Sprintf(formatCaller+format, v...))
+	_logger.Fatal(fmt.Sprintf(formatCaller+format, v...))
 }
 
 func addExField(ctx context.Context) (string, []interface{}) {
@@ -113,62 +112,66 @@ func addExField(ctx context.Context) (string, []interface{}) {
 	}
 	return formatPre, v
 }
-func addCaller() (string, []interface{}) {
+func addCaller(_logger *zap.Logger) (zap.Logger, string, []interface{}) {
 	format := "%s:%d\n"
 	_, file, line, _ := runtime.Caller(2)
 	_v := make([]interface{}, 0)
 	_v = append(_v, file, line)
-	return format, _v
+	if formatJson() {
+		_logger.With(zap.String("caller", fmt.Sprintf(format, file, line)))
+		return *_logger, "", []interface{}{}
+	}
+	return *logger, format, _v
 }
 
 // 下面的logger方法会携带trace id
 
 func CtxInfof(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
 	_v := append(vField, vCaller...)
 	v = append(_v, v...)
-	withContext(ctx).Info(fmt.Sprintf(formatField+formatCaller+format, v...))
+	_logger.Info(fmt.Sprintf(formatField+formatCaller+format, v...))
 }
 
 func CtxErrorf(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
 	_v := append(vField, vCaller...)
 	v = append(_v, v...)
-	withContext(ctx).Error(fmt.Sprintf(formatField+formatCaller+format, v...))
+	_logger.Error(fmt.Sprintf(formatField+formatCaller+format, v...))
 }
 
 func CtxWarnf(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
 	_v := append(vField, vCaller...)
 	v = append(_v, v...)
-	withContext(ctx).Warn(fmt.Sprintf(formatField+formatCaller+format, v...))
+	_logger.Warn(fmt.Sprintf(formatField+formatCaller+format, v...))
 }
 
 func CtxDebugf(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
 	_v := append(vField, vCaller...)
 	v = append(_v, v...)
-	withContext(ctx).Debug(fmt.Sprintf(formatField+formatCaller+format, v...))
+	_logger.Debug(fmt.Sprintf(formatField+formatCaller+format, v...))
 }
 
 func CtxPanicf(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
 	_v := append(vField, vCaller...)
 	v = append(_v, v...)
-	withContext(ctx).Panic(fmt.Sprintf(formatField+formatCaller+format, v...))
+	_logger.Panic(fmt.Sprintf(formatField+formatCaller+format, v...))
 }
 
 func CtxFatalf(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
-	formatCaller, vCaller := addCaller()
+	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
 	_v := append(vField, vCaller...)
 	v = append(_v, v...)
-	withContext(ctx).Fatal(fmt.Sprintf(formatField+formatCaller+format, v...))
+	_logger.Fatal(fmt.Sprintf(formatField+formatCaller+format, v...))
 }
 
 //func TraceInfof(ctx context.Context, format string, v ...interface{}) {
