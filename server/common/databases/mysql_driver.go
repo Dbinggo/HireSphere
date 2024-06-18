@@ -1,8 +1,8 @@
 package databases
 
 import (
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/configs"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

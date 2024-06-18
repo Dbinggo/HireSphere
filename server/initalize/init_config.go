@@ -2,9 +2,9 @@ package initalize
 
 import (
 	"flag"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/configs"
 	"github.com/Dbinggo/HireSphere/server/global"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"time"

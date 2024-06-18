@@ -2,9 +2,9 @@ package test
 
 import (
 	"fmt"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/configs"
 	log2 "github.com/Dbinggo/HireSphere/server/log"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"testing"
 )
 

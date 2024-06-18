@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"context"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/global"
 	"github.com/Dbinggo/HireSphere/server/internal/router/manager"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/google/uuid"
 	"go.uber.org/zap"

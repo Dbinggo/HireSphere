@@ -2,9 +2,9 @@ package test
 
 import (
 	"context"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/global"
 	"github.com/Dbinggo/HireSphere/server/initalize"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"testing"
 )
 

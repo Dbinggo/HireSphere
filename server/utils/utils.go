@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"path/filepath"
 	"runtime"
 )

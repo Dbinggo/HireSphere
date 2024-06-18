@@ -3,8 +3,8 @@ package myRedis
 import (
 	"context"
 	"fmt"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/configs"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"github.com/go-redis/redis/v8"
 )
 

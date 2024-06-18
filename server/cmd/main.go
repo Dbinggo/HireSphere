@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/initalize"
 	"github.com/Dbinggo/HireSphere/server/internal/router"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 )
 
 func main() {

@@ -2,8 +2,7 @@ package manager
 
 import (
 	"fmt"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
-
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/route"

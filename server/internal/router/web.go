@@ -2,11 +2,11 @@ package router
 
 import (
 	"fmt"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/global"
 	_ "github.com/Dbinggo/HireSphere/server/internal/router/api"
 	"github.com/Dbinggo/HireSphere/server/internal/router/manager"
 	_ "github.com/Dbinggo/HireSphere/server/internal/router/middleware"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

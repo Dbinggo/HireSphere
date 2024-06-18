@@ -1,9 +1,9 @@
 package initalize
 
 import (
+	"github.com/Dbinggo/HireSphere/server/common/log"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/configs"
-	"github.com/Dbinggo/HireSphere/server/log"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 

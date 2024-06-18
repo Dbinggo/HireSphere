@@ -1,11 +1,11 @@
 package initalize
 
 import (
+	"github.com/Dbinggo/HireSphere/server/common/databases"
+	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
+	"github.com/Dbinggo/HireSphere/server/common/myRedis"
 	"github.com/Dbinggo/HireSphere/server/configs"
-	"github.com/Dbinggo/HireSphere/server/db/databases"
-	"github.com/Dbinggo/HireSphere/server/db/myRedis"
 	"github.com/Dbinggo/HireSphere/server/global"
-	"github.com/Dbinggo/HireSphere/server/log/zlog"
 )
 
 func InitDataBase(config configs.Config) {
