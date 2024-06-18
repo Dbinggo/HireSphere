@@ -3,8 +3,9 @@ app:
   host: ""
   env: dev
 log:
-  format: json
+  format: cmd
   director: /logs
+  caller: true
 
 database:
   driver: mysql

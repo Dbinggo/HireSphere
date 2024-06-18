@@ -27,29 +27,34 @@ func GetLogger(config *configs.Config) (*zap.Logger, *hertzzap.Logger) {
 	default:
 		encoder = zapcore.NewConsoleEncoder
 	}
+	var needColour = false
+	// 彩色使用位置 非json 且为开发模式
+	if config.Log.Format != global.LOGGER_FORMAT_JSON && config.App.Env == global.CONFIG_APP_ENV_DEV {
+		needColour = true
+	}
 
 	switch config.App.Env {
-	case "pro":
+	case global.CONFIG_APP_ENV_PRO:
 		//本开发模式旨在将正常信息及以上的log记录在文件中，方便查看
 		fileInfoConfig := newZapConfig().
-			setEncoder(false, encoder).
-			setFileWriteSyncer(global.Path + config.Log.Director + "info.log").
+			setEncoder(needColour, encoder).
+			setFileWriteSyncer(global.Path + config.Log.Director + global.LOGGER_FILE_INFO_NAME).
 			setLevelEnabler(zapcore.DebugLevel).
 			getConfig()
 		fileInfoCore := fileInfoConfig.getCore()
 		//本开发模式旨在将error及以上的log记录在文件中，方便查看
 		fileErrorConfig := newZapConfig().
-			setEncoder(false, encoder).
-			setFileWriteSyncer(global.Path + config.Log.Director + "error.log").
+			setEncoder(needColour, encoder).
+			setFileWriteSyncer(global.Path + config.Log.Director + global.LOGGER_FILE_ERROR_NAME).
 			setLevelEnabler(zapcore.ErrorLevel).
 			getConfig()
 		fileErrorCore := fileErrorConfig.getCore()
 		coreConfigs = append(coreConfigs, fileInfoConfig, fileErrorConfig)
 		cors = append(cors, fileInfoCore, fileErrorCore)
-	case "dev":
+	case global.CONFIG_APP_ENV_DEV:
 		//输出在控制台
 		consoleInfoConfig := newZapConfig().
-			setEncoder(true, encoder).
+			setEncoder(needColour, encoder).
 			setStdOutWriteSyncer().
 			setLevelEnabler(zapcore.DebugLevel).
 			getConfig()
@@ -59,7 +64,7 @@ func GetLogger(config *configs.Config) (*zap.Logger, *hertzzap.Logger) {
 	default:
 		//默认开发模式
 		consoleInfoConfig := newZapConfig().
-			setEncoder(true, encoder).
+			setEncoder(needColour, encoder).
 			setStdOutWriteSyncer().
 			setLevelEnabler(zapcore.DebugLevel).
 			getConfig()

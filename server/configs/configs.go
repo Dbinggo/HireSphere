@@ -18,7 +18,7 @@ type LoggerConfig struct {
 	//Level    int8   `mapstructure:"level"`
 	Format   string `mapstructure:"format"`
 	Director string `mapstructure:"director"`
-	ShowLine bool   `mapstructure:"show-line"`
+	Caller   bool   `mapstructure:"caller"`
 }
 
 type DBConfig struct {

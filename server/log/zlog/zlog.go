@@ -23,7 +23,13 @@ func formatJson() bool {
 	if global.Config == nil {
 		return false
 	}
-	return global.Config.Log.Format == "json"
+	return global.Config.Log.Format == global.LOGGER_FORMAT_JSON
+}
+func needCaller() bool {
+	if global.Config == nil {
+		return false
+	}
+	return global.Config.Log.Caller
 }
 
 // NewContext
@@ -99,7 +105,7 @@ func Fatalf(format string, v ...interface{}) {
 }
 
 func addExField(ctx context.Context) (string, []interface{}) {
-	formatPre := ""
+	var formatPre string
 	v := make([]interface{}, 0)
 	if !formatJson() {
 		if exField, ok := ctx.Value(loggerExKey).([]zap.Field); ok {
@@ -108,20 +114,22 @@ func addExField(ctx context.Context) (string, []interface{}) {
 				formatPre = formatPre + formatSeparator
 			}
 		}
-
 	}
 	return formatPre, v
 }
 func addCaller(_logger *zap.Logger) (zap.Logger, string, []interface{}) {
-	format := "%s:%d\n"
+	if !needCaller() {
+		return *_logger, global.COMMON_EMPTY_STRING, nil
+	}
+	format := "%s:%d"
 	_, file, line, _ := runtime.Caller(2)
 	_v := make([]interface{}, 0)
 	_v = append(_v, file, line)
 	if formatJson() {
-		_logger.With(zap.String("caller", fmt.Sprintf(format, file, line)))
-		return *_logger, "", []interface{}{}
+		_logger = _logger.With(zap.String(global.LOGGER_KEY_CALLER, fmt.Sprintf(format, file, line)))
+		return *_logger, global.COMMON_EMPTY_STRING, []interface{}{}
 	}
-	return *logger, format, _v
+	return *logger, format + "\n", _v
 }
 
 // 下面的logger方法会携带trace id
