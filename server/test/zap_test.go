@@ -2,9 +2,9 @@ package test
 
 import (
 	"fmt"
+	log2 "github.com/Dbinggo/HireSphere/server/common/log"
 	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/configs"
-	log2 "github.com/Dbinggo/HireSphere/server/log"
 	"testing"
 )
 
@@ -27,7 +27,7 @@ var (
 func TestLog(t *testing.T) {
 	conf := new(configs.Config)
 	conf.App.Env = "pro"
-	log := log2.GetZap(conf)
+	log, _ := log2.GetLogger(conf)
 	zlog.InitLogger(log)
 	for i := 0; i < 10000; i++ {
 		zlog.Infof(testLog + fmt.Sprintf(",i=%d", i))
