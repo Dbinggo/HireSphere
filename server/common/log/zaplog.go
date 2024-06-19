@@ -86,14 +86,17 @@ func makeZapLogger(cors []zapcore.Core, options ...zap.Option) *zap.Logger {
 }
 func makeHertzZapLogger(coreConfigs []zapConfig, zapOptions ...zap.Option) *hertzzap.Logger {
 	var options []hertzzap.Option
+	var cores []hertzzap.CoreConfig
 	for _, coreConfig := range coreConfigs {
-		options = append(options, hertzzap.WithCoreEnc(coreConfig.getEncoder()))
-		for _, ws := range coreConfig.getWriteSyncers() {
-			options = append(options, hertzzap.WithCoreWs(ws))
+		for _, ws := range coreConfig.writeSyncerSlice {
+			cores = append(cores, hertzzap.CoreConfig{
+				Enc: coreConfig.encoder,
+				Ws:  ws,
+				Lvl: coreConfig.levelEnabler,
+			})
 		}
-		options = append(options, hertzzap.WithCoreLevel(zap.NewAtomicLevelAt(zap.DebugLevel)))
 	}
-	options = append(options, hertzzap.WithZapOptions(zapOptions...))
+	options = append(options, hertzzap.WithCores(cores...))
 	logger := hertzzap.NewLogger(options...)
 	return logger
 }
