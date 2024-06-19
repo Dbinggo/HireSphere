@@ -33,7 +33,9 @@ func InitConfig() {
 		zlog.Debugf("%+v", configs.Conf)
 		global.Config = configs.Conf
 		Eve()
-		Init()
+		InitLog(configs.Conf)
+		InitDataBase(*configs.Conf)
+		InitRedis(*configs.Conf)
 	})
 	// 将配置文件读入 viper
 	if err := viper.ReadInConfig(); err != nil {

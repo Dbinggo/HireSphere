@@ -1,15 +1,17 @@
 FROM golang:alpine as builder
 
-WORKDIR /go/src/github.com/Dbinggo/HireSphere/server
+WORKDIR /server
 
-COPY . .
+COPY  . .
 
 RUN go env -w GO111MODULE=on \
     && go env -w GOPROXY=https://goproxy.cn,direct \
     && go env -w CGO_ENABLED=0 \
     && go env \
     && go mod tidy \
-    && go build -o server .
+    && cd cmd \
+    && go build -o  server . \
+    && mv ./server ../
 
 FROM alpine:latest
 
@@ -17,9 +19,8 @@ FROM alpine:latest
 
 WORKDIR /server
 
-COPY --from=builder /go/src/github.com/Dbinggo/HireSphere/server ./
-COPY --from=builder /go/src/github.com/Dbinggo/HireSphere/server/resource ./resource/
-COPY --from=builder /go/src/github.com/Dbinggo/HireSphere/server/config.yaml ./
+COPY --from=builder /server/server ./
+COPY --from=builder /server/config.docker.yaml ./
 
 EXPOSE 8888
-ENTRYPOINT ./server -c config.yaml
+ENTRYPOINT ./server -c config.docker.yaml

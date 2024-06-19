@@ -2,26 +2,18 @@ package router
 
 import (
 	"fmt"
-	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
-	"github.com/Dbinggo/HireSphere/server/global"
+	"github.com/Dbinggo/HireSphere/server/configs"
 	_ "github.com/Dbinggo/HireSphere/server/internal/router/api"
 	"github.com/Dbinggo/HireSphere/server/internal/router/manager"
 	_ "github.com/Dbinggo/HireSphere/server/internal/router/middleware"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
-func RunServer() {
-	h, err := listen()
-	if err != nil {
-		zlog.Errorf("Listen error: %v", err)
-		panic(err.Error())
-	}
-	h.Spin()
-}
+var hServer *server.Hertz
 
-func listen() (*server.Hertz, error) {
+func RunServer(config configs.Config) {
+	hServer = server.Default(server.WithHostPorts(fmt.Sprintf("%s:%d", config.App.Host, config.App.Port)))
+	manager.RouteHandler.Register(hServer)
 
-	h := server.Default(server.WithHostPorts(fmt.Sprintf("%s:%d", global.Config.App.Host, global.Config.App.Port)))
-	manager.RouteHandler.Register(h)
-	return h, nil
+	hServer.Spin()
 }
