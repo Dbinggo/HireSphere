@@ -20,17 +20,17 @@ func InitConfig() {
 	var configPath string
 	flag.StringVar(&configPath, "c", global.Path+global.CONFIG_FILE_PATH_DEFAULT, "配置文件绝对路径或相对路径")
 	flag.Parse()
-	zlog.Infof("配置文件路径为 %s", configPath)
+	zlog.Infof("the config path is %s", configPath)
 	// 初始化配置文件
 	viper.SetConfigFile(configPath)
 	viper.WatchConfig()
 	// 观察配置文件变动
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		zlog.Warnf("配置文件发生变化")
+		zlog.Warnf("config file changed ")
 		if err := viper.Unmarshal(&configs.Conf); err != nil {
-			zlog.Errorf("无法反序列化配置文件 %v", err)
+			zlog.Errorf("failed to unmarshal with err :  %v", err)
 		}
-		zlog.Debugf("%+v", configs.Conf)
+		zlog.Debugf("new config is %+v", configs.Conf)
 		global.Config = configs.Conf
 		Eve()
 		InitLog(configs.Conf)
@@ -39,13 +39,13 @@ func InitConfig() {
 	})
 	// 将配置文件读入 viper
 	if err := viper.ReadInConfig(); err != nil {
-		zlog.Panicf("无法读取配置文件 err: %v", err)
+		zlog.Panicf("failed to get config.yaml err: %v", err)
 
 	}
 	// 解析到变量中
 	if err := viper.Unmarshal(&configs.Conf); err != nil {
-		zlog.Panicf("无法解析配置文件 err: %v", err)
+		zlog.Panicf("fail to unmarshal config.yaml with err: %v", err)
 	}
-	zlog.Debugf("配置文件为 ： %+v", configs.Conf)
+	zlog.Debugf("config.yaml is : %+v", configs.Conf)
 	global.Config = configs.Conf
 }

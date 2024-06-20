@@ -32,14 +32,14 @@ func GetLogger(config *configs.Config) (*zap.Logger, *hertzzap.Logger) {
 	if config.Log.Format != global.LOGGER_FORMAT_JSON && config.App.Env == global.CONFIG_APP_ENV_DEV {
 		needColour = true
 	}
-
+	level := transLevel(config.Log.Level)
 	switch config.App.Env {
 	case global.CONFIG_APP_ENV_PRO:
 		//本开发模式旨在将正常信息及以上的log记录在文件中，方便查看
 		fileInfoConfig := newZapConfig().
 			setEncoder(needColour, encoder).
 			setFileWriteSyncer(global.Path + config.Log.Director + global.LOGGER_FILE_INFO_NAME).
-			setLevelEnabler(zapcore.DebugLevel).
+			setLevelEnabler(level).
 			getConfig()
 		fileInfoCore := fileInfoConfig.getCore()
 		//本开发模式旨在将error及以上的log记录在文件中，方便查看
@@ -56,7 +56,7 @@ func GetLogger(config *configs.Config) (*zap.Logger, *hertzzap.Logger) {
 		consoleInfoConfig := newZapConfig().
 			setEncoder(needColour, encoder).
 			setStdOutWriteSyncer().
-			setLevelEnabler(zapcore.DebugLevel).
+			setLevelEnabler(level).
 			getConfig()
 		consoleInfoCore := consoleInfoConfig.getCore()
 		coreConfigs = append(coreConfigs, consoleInfoConfig)
@@ -66,7 +66,7 @@ func GetLogger(config *configs.Config) (*zap.Logger, *hertzzap.Logger) {
 		consoleInfoConfig := newZapConfig().
 			setEncoder(needColour, encoder).
 			setStdOutWriteSyncer().
-			setLevelEnabler(zapcore.DebugLevel).
+			setLevelEnabler(level).
 			getConfig()
 		consoleInfoCore := consoleInfoConfig.getCore()
 		coreConfigs = append(coreConfigs, consoleInfoConfig)
@@ -186,4 +186,20 @@ func newTimeEncoder() zapcore.TimeEncoder {
 	return func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(t.Format("2006/1/2 15:04:05.000"))
 	}
+}
+
+func transLevel(lev string) zapcore.Level {
+	var levels = []string{
+		"debug",
+		"info",
+		"warn",
+		"error",
+		"panic",
+	}
+	for power, level := range levels {
+		if level == lev {
+			return zapcore.Level(power)
+		}
+	}
+	return zapcore.DebugLevel
 }

@@ -13,6 +13,6 @@ func main() {
 	// 工程进入前夕，释放资源
 	defer initalize.Eve()
 	router.RunServer(*global.Config)
-	zlog.Infof("程序运行成功！")
+	zlog.Infof("program is end！")
 
 }

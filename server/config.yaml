@@ -1,11 +1,12 @@
 app:
   port: 8888
   host: ""
-  env: pro
+  env: dev
 log:
   format: cmd
   director: /logs/
   caller: true
+  level: debug
 
 database:
   driver: mysql

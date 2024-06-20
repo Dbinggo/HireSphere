@@ -19,6 +19,7 @@ type LoggerConfig struct {
 	Format   string `mapstructure:"format"`
 	Director string `mapstructure:"director"`
 	Caller   bool   `mapstructure:"caller"`
+	Level    string `mapstructure:"level"`
 }
 
 type DBConfig struct {
