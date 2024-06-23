@@ -11,7 +11,7 @@ import (
 )
 
 // TODO 可以添加环境变量 环境变量没有加在上面 单纯觉得有点用不到
-func InitConfig() {
+func InitConfig(config *configs.Config) {
 	// 初始化时间为东八区的时间
 	var cstZone = time.FixedZone("CST", 8*3600) // 东八
 	time.Local = cstZone
@@ -27,15 +27,15 @@ func InitConfig() {
 	// 观察配置文件变动
 	viper.OnConfigChange(func(in fsnotify.Event) {
 		zlog.Warnf("config file changed ")
-		if err := viper.Unmarshal(&configs.Conf); err != nil {
+		if err := viper.Unmarshal(&config); err != nil {
 			zlog.Errorf("failed to unmarshal with err :  %v", err)
 		}
-		zlog.Debugf("new config is %+v", configs.Conf)
-		global.Config = configs.Conf
+		zlog.Debugf("new config is %+v", config)
+		global.Config = config
 		Eve()
-		InitLog(configs.Conf)
-		InitDataBase(*configs.Conf)
-		InitRedis(*configs.Conf)
+		InitLog(config)
+		InitDataBase(*config)
+		InitRedis(*config)
 	})
 	// 将配置文件读入 viper
 	if err := viper.ReadInConfig(); err != nil {
@@ -43,9 +43,9 @@ func InitConfig() {
 
 	}
 	// 解析到变量中
-	if err := viper.Unmarshal(&configs.Conf); err != nil {
+	if err := viper.Unmarshal(&config); err != nil {
 		zlog.Panicf("fail to unmarshal config.yaml with err: %v", err)
 	}
-	zlog.Debugf("config.yaml is : %+v", configs.Conf)
-	global.Config = configs.Conf
+	zlog.Debugf("config.yaml is : %+v", config)
+	global.Config = config
 }

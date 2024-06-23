@@ -1,7 +1,5 @@
 package configs
 
-var Conf = new(Config)
-
 type Config struct {
 	App   ApplicationConfig `mapstructure:"app"`
 	Log   LoggerConfig      `mapstructure:"log"`

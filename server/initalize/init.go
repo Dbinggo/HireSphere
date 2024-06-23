@@ -8,7 +8,7 @@ import (
 func Init() {
 	InitLog(global.Config)
 	InitPath()
-	InitConfig()
+	InitConfig(global.Config)
 	InitLog(global.Config)
 	InitDataBase(*global.Config)
 	InitRedis(*global.Config)

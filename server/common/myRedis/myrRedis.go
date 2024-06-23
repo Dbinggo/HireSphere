@@ -19,12 +19,12 @@ func GetRedisClient(config configs.Config) (*redis.Client, error) {
 	}
 	client := redis.NewClient(&redis.Options{
 		Network:            "",
-		Addr:               fmt.Sprintf(redisAddr, configs.Conf.Redis.Host, configs.Conf.Redis.Port),
+		Addr:               fmt.Sprintf(redisAddr, config.Redis.Host, config.Redis.Port),
 		Dialer:             nil,
 		OnConnect:          nil,
 		Username:           "",
-		Password:           configs.Conf.Redis.Password,
-		DB:                 configs.Conf.Redis.DB,
+		Password:           config.Redis.Password,
+		DB:                 config.Redis.DB,
 		MaxRetries:         0,
 		MinRetryBackoff:    0,
 		MaxRetryBackoff:    0,
