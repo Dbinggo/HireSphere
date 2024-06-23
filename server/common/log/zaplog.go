@@ -198,7 +198,7 @@ func transLevel(lev string) zapcore.Level {
 	}
 	for power, level := range levels {
 		if level == lev {
-			return zapcore.Level(power)
+			return zapcore.Level(power - 1)
 		}
 	}
 	return zapcore.DebugLevel
