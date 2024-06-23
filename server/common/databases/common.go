@@ -1,5 +1,6 @@
 package databases
 
+// todo log抽象类接口
 import (
 	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
 	"github.com/Dbinggo/HireSphere/server/configs"
