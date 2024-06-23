@@ -5,6 +5,7 @@ type Config struct {
 	Log   LoggerConfig      `mapstructure:"log"`
 	DB    DBConfig          `mapstructure:"database"`
 	Redis RedisConfig       `mapstructure:"redis"`
+	ES    ESConfig          `mapstructure:"es"`
 }
 
 type ApplicationConfig struct {
@@ -13,7 +14,6 @@ type ApplicationConfig struct {
 	Env  string `mapstructure:"env"`
 }
 type LoggerConfig struct {
-	//Level    int8   `mapstructure:"level"`
 	Format   string `mapstructure:"format"`
 	Director string `mapstructure:"director"`
 	Caller   bool   `mapstructure:"caller"`
@@ -36,4 +36,10 @@ type RedisConfig struct {
 type KafkaConfig struct {
 	host string `mapstructure:"host"`
 	port int    `mapstructure:"port"`
+}
+type ESConfig struct {
+	Enable   bool   `mapstructure:"enable"`
+	UserName string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	Address  string `mapstructure:"address"`
 }

@@ -20,3 +20,9 @@ redis:
   port: 16379
   password: DbinggoYjddb
   db: 0
+
+es:
+  enable: false
+  username: ""
+  password: ""
+  address: "127.0.0.0:9200"
