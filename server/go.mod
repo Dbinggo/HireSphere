@@ -5,6 +5,7 @@ go 1.22.3
 require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/cloudwego/hertz v0.9.1
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-redis/redis/v8 v8.11.5
