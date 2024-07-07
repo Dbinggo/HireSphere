@@ -3,10 +3,9 @@ package api
 import (
 	"context"
 	"github.com/Dbinggo/HireSphere/server/common/log/zlog"
+	"github.com/Dbinggo/HireSphere/server/internal/handler/response"
 	"github.com/Dbinggo/HireSphere/server/internal/router/manager"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/hertz/pkg/route"
 )
 
@@ -18,8 +17,12 @@ func init() {
 }
 func Test(ctx context.Context, c *app.RequestContext) {
 	zlog.Infof("load - test")
-	zlog.CtxInfof(ctx, "load ctx info - test")
-	zlog.CtxWarnf(ctx, "load ctx warn - test")
-	zlog.CtxErrorf(ctx, "load ctx error - test")
-	c.JSON(consts.StatusOK, utils.H{"ping": "pong"})
+	zlog.InfofCtx(ctx, "load ctx info - test")
+	zlog.WarnfCtx(ctx, "load ctx warn - test")
+	zlog.ErrorfCtx(ctx, "load ctx error - test")
+	r := response.NewResponse(c)
+	r.Error(ctx, response.MsgCode{
+		Code: 500,
+		Msg:  "test error",
+	})
 }
