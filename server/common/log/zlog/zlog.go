@@ -208,7 +208,7 @@ func PanicfCtx(ctx context.Context, format string, v ...interface{}) {
 func FatalfCtx(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
 	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
-	addDebugMessage(ctx, fmt.Sprintf("[FATAL] "+formatCaller, vCaller...))
+	addDebugMessage(ctx, fmt.Sprintf("[FATA] "+formatCaller, vCaller...))
 	addDebugMessage(ctx, fmt.Sprintf(format, v...))
 	_v := append(vField, v...)
 	v = append(vCaller, _v...)
