@@ -15,6 +15,7 @@ type ApplicationConfig struct {
 }
 type LoggerConfig struct {
 	Format   string `mapstructure:"format"`
+	Debug    bool   `mapstructure:"debug"`
 	Director string `mapstructure:"director"`
 	Caller   bool   `mapstructure:"caller"`
 	Level    string `mapstructure:"level"`
