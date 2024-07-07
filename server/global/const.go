@@ -1,5 +1,7 @@
 package global
 
+import "time"
+
 // 所有可导出的常量读取位置
 // 命名规范 ：哪个包下（或者用于哪类包）_哪个分类_具体描述_二级描述
 const (
@@ -23,6 +25,17 @@ const (
 
 	LOGGER_KEY_CALLER  = "caller"
 	LOGGER_KEY_TRACEID = "traceId"
+	LOGGER_KEY_LOG     = "log"
+	LOGGER_KEY_USER    = "user"
 	/**************************LOGGER*************************/
+
+	/*************************JWTTOKEN************************/
+	JWT_SECRET = "HireSphere"
+	JWT_EXPIRE = 3 * time.Hour
+	/*************************JWTTOKEN************************/
+
+	/**************************REDIS*************************/
+	REDIS_KEY_USER_FORMATE = "hireSphere:user:%d:int64"
+	/**************************REDIS*************************/
 
 )
