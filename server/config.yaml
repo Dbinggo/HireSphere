@@ -4,6 +4,7 @@ app:
   env: dev
 log:
   format: cmd
+  debug: true
   director: /logs/
   caller: true
   level: debug

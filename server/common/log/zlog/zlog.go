@@ -25,6 +25,13 @@ func formatJson() bool {
 	}
 	return global.Config.Log.Format == global.LOGGER_FORMAT_JSON
 }
+func debug() bool {
+	if global.Config == nil {
+		return false
+	}
+	return global.Config.Log.Debug
+}
+
 func needCaller() bool {
 	if global.Config == nil {
 		return false
@@ -40,7 +47,7 @@ func needCaller() bool {
 //	@return context.Context
 func NewContext(ctx context.Context, fields ...zapcore.Field) context.Context {
 	if formatJson() {
-		return context.WithValue(ctx, loggerKey, withContext(ctx).With(fields...))
+		ctx = context.WithValue(ctx, loggerKey, withContext(ctx).With(fields...))
 	} else {
 		ctx = context.WithValue(ctx, loggerKey, withContext(ctx))
 		if ex, ok := ctx.Value(loggerExKey).([]zapcore.Field); ok {
@@ -49,8 +56,11 @@ func NewContext(ctx context.Context, fields ...zapcore.Field) context.Context {
 		} else {
 			ctx = context.WithValue(ctx, loggerExKey, fields)
 		}
-		return ctx
 	}
+	if debug() {
+		ctx = context.WithValue(ctx, global.LOGGER_KEY_LOG, &[]string{})
+	}
+	return ctx
 }
 
 func InitLogger(zapLogger *zap.Logger) {
@@ -124,6 +134,7 @@ func addCaller(_logger *zap.Logger) (zap.Logger, string, []interface{}) {
 	format := "%s:%d"
 	_, file, line, _ := runtime.Caller(2)
 	_v := make([]interface{}, 0)
+	file = file[len(global.Path)+1:]
 	_v = append(_v, file, line)
 	if formatJson() {
 		_logger = _logger.With(zap.String(global.LOGGER_KEY_CALLER, fmt.Sprintf(format, file, line)))
@@ -131,55 +142,77 @@ func addCaller(_logger *zap.Logger) (zap.Logger, string, []interface{}) {
 	}
 	return *logger, format + "\n", _v
 }
+func addDebugMessage(ctx context.Context, message string) {
+	if debug() {
+		if log, ok := ctx.Value(global.LOGGER_KEY_LOG).(*[]string); ok {
+			*log = append(*log, message)
+			go func() {}()
+		} else {
+			ctx = context.WithValue(ctx, global.LOGGER_KEY_LOG, []string{message})
+		}
+	}
+}
 
 // 下面的logger方法会携带trace id
 
-func CtxInfof(ctx context.Context, format string, v ...interface{}) {
+func InfofCtx(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
 	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
-	_v := append(vField, vCaller...)
-	v = append(_v, v...)
-	_logger.Info(fmt.Sprintf(formatField+formatCaller+format, v...))
+	addDebugMessage(ctx, fmt.Sprintf("[INFO]  "+formatCaller, vCaller...))
+	addDebugMessage(ctx, fmt.Sprintf(format, v...))
+	_v := append(vField, v...)
+	v = append(vCaller, _v...)
+	_logger.Info(fmt.Sprintf(formatCaller+formatField+format, v...))
 }
 
-func CtxErrorf(ctx context.Context, format string, v ...interface{}) {
+func ErrorfCtx(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
 	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
-	_v := append(vField, vCaller...)
-	v = append(_v, v...)
-	_logger.Error(fmt.Sprintf(formatField+formatCaller+format, v...))
+	addDebugMessage(ctx, fmt.Sprintf("[ERROR] "+formatCaller, vCaller...))
+	addDebugMessage(ctx, fmt.Sprintf(format, v...))
+	_v := append(vField, v...)
+	v = append(vCaller, _v...)
+	_logger.Error(fmt.Sprintf(formatCaller+formatField+format, v...))
 }
 
-func CtxWarnf(ctx context.Context, format string, v ...interface{}) {
+func WarnfCtx(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
 	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
-	_v := append(vField, vCaller...)
-	v = append(_v, v...)
-	_logger.Warn(fmt.Sprintf(formatField+formatCaller+format, v...))
+	addDebugMessage(ctx, fmt.Sprintf("[WARN]  "+formatCaller, vCaller...))
+	addDebugMessage(ctx, fmt.Sprintf(format, v...))
+	_v := append(vField, v...)
+	v = append(vCaller, _v...)
+	_logger.Warn(fmt.Sprintf(formatCaller+formatField+format, v...))
 }
 
-func CtxDebugf(ctx context.Context, format string, v ...interface{}) {
+func DebugfCtx(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
 	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
-	_v := append(vField, vCaller...)
-	v = append(_v, v...)
-	_logger.Debug(fmt.Sprintf(formatField+formatCaller+format, v...))
+	addDebugMessage(ctx, fmt.Sprintf("[DEBUG] "+formatCaller, vCaller...))
+	addDebugMessage(ctx, fmt.Sprintf(format, v...))
+	_v := append(vField, v...)
+	v = append(vCaller, _v...)
+	_logger.Debug(fmt.Sprintf(formatCaller+formatField+format, v...))
 }
 
-func CtxPanicf(ctx context.Context, format string, v ...interface{}) {
+func PanicfCtx(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
 	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
-	_v := append(vField, vCaller...)
-	v = append(_v, v...)
-	_logger.Panic(fmt.Sprintf(formatField+formatCaller+format, v...))
+	addDebugMessage(ctx, fmt.Sprintf("[PANIC] "+formatCaller, vCaller...))
+	addDebugMessage(ctx, fmt.Sprintf(format, v...))
+	_v := append(vField, v...)
+	v = append(vCaller, _v...)
+	_logger.Panic(fmt.Sprintf(formatCaller+formatField+format, v...))
 }
 
-func CtxFatalf(ctx context.Context, format string, v ...interface{}) {
+func FatalfCtx(ctx context.Context, format string, v ...interface{}) {
 	formatField, vField := addExField(ctx)
 	_logger, formatCaller, vCaller := addCaller(withContext(ctx))
-	_v := append(vField, vCaller...)
-	v = append(_v, v...)
-	_logger.Fatal(fmt.Sprintf(formatField+formatCaller+format, v...))
+	addDebugMessage(ctx, fmt.Sprintf("[FATAL] "+formatCaller, vCaller...))
+	addDebugMessage(ctx, fmt.Sprintf(format, v...))
+	_v := append(vField, v...)
+	v = append(vCaller, _v...)
+	_logger.Fatal(fmt.Sprintf(formatCaller+formatField+format, v...))
 }
 
 //func TraceInfof(ctx context.Context, format string, v ...interface{}) {
