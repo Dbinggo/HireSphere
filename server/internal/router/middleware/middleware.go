@@ -11,8 +11,8 @@ import (
 	"github.com/Dbinggo/HireSphere/server/internal/router/manager"
 	"github.com/Dbinggo/HireSphere/server/utils"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"time"
 )

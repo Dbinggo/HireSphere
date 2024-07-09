@@ -6,6 +6,7 @@ import (
 	"github.com/Dbinggo/HireSphere/server/common/myRedis"
 	"github.com/Dbinggo/HireSphere/server/configs"
 	"github.com/Dbinggo/HireSphere/server/global"
+	"github.com/Dbinggo/HireSphere/server/internal/model"
 )
 
 func InitDataBase(config configs.Config) {
@@ -15,7 +16,7 @@ func InitDataBase(config configs.Config) {
 		break
 	}
 	if config.App.Env != "pro" {
-		err := global.DB.AutoMigrate()
+		err := global.DB.AutoMigrate(&model.User{})
 		if err != nil {
 			zlog.Fatalf("数据库迁移失败！")
 		}
