@@ -16,7 +16,7 @@ type DataBase interface {
 
 type Find interface {
 	KeyName() string
-	Where() string
+	Where() *gorm.DB
 }
 
 func InitDataBases(base DataBase, config configs.Config) {
@@ -38,7 +38,7 @@ func FindInRedisOrDB(ctx context.Context, f Find) error {
 		zlog.DebugfCtx(ctx, "从redis中查找到数据：%v", f)
 		return nil
 	}
-	err = global.DB.Model(&f).Where(f.Where()).First(f).Error
+	err = f.Where().Find(f).Error
 	if err != nil {
 		zlog.InfofCtx(ctx, "数据库中没有数据")
 		return err

@@ -1,6 +1,10 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/Dbinggo/HireSphere/server/global"
+	"gorm.io/gorm"
+)
 
 // User 用户表
 type User struct {
@@ -18,10 +22,12 @@ func (User) TableName() string {
 	return "user"
 }
 
-func (u User) Where() string {
-	return fmt.Sprintf("id=%d", u.ID)
+// Where 查询条件
+func (u User) Where() *gorm.DB {
+	return global.DB.Model(&u).Where("id = ?", u.ID)
 }
 
+// KeyName RedisKey
 func (u User) KeyName() string {
 	return fmt.Sprintf("user:%d:hash", u.ID)
 }
