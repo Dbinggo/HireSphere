@@ -22,7 +22,17 @@ func TestFindInRedisOrInDB(t *testing.T) {
 	}
 	global.DB.Create(user)
 
-	err := databases.FindInRedisOrDB(context.Background(), &user)
+	var findUserRdb = func() error {
+		return global.Rdb.HGetAll(context.Background(), user.KeyName()).Scan(&user)
+	}
+	var findUserDB = func() error {
+		return global.DB.Where("id = ?", user.ID).First(&user).Error
+	}
+	var setUserRdb = func() error {
+		return global.Rdb.HMSet(context.Background(), user.KeyName(), user).Err()
+	}
+
+	err := databases.FindInRedisOrDB(context.Background(), findUserRdb, findUserDB, setUserRdb, user)
 	if err != nil {
 		t.Errorf("FindInRedisOrDB() error = %v", err)
 		return

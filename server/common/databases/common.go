@@ -14,11 +14,6 @@ type DataBase interface {
 	initDataBases(config configs.Config) (*gorm.DB, error)
 }
 
-type Find interface {
-	KeyName() string
-	Where() *gorm.DB
-}
-
 func InitDataBases(base DataBase, config configs.Config) {
 	var err error
 	global.DB, err = base.initDataBases(config)
@@ -30,23 +25,32 @@ func InitDataBases(base DataBase, config configs.Config) {
 	return
 }
 
-func FindInRedisOrDB(ctx context.Context, f Find) error {
-	err := global.Rdb.HGetAll(ctx, f.KeyName()).Scan(f)
+type rdbFindFunc func() error
+type dbFindFunc func() error
+type rdbSetFunc func() error
+type showValueFunc interface{}
+
+func FindInRedisOrDB(ctx context.Context, findRdb rdbFindFunc, findDB dbFindFunc, setRdb rdbSetFunc, value showValueFunc) error {
+	err := findRdb()
 	if err != nil {
-		zlog.InfofCtx(ctx, "redis中没有数据，从数据库中查找")
+		zlog.ErrorfCtx(ctx, "redis中未找到数据 %v", err)
+		err = findDB()
+		if err != nil {
+			zlog.ErrorfCtx(ctx, "数据库中未找到数据 %v", err)
+			return err
+		} else {
+			zlog.InfofCtx(ctx, "数据库中找到数据 %v", value)
+			err = setRdb()
+			if err != nil {
+				zlog.ErrorfCtx(ctx, "redis中设置数据失败 %v", err)
+				return err
+			} else {
+				zlog.InfofCtx(ctx, "redis中设置数据成功")
+				return nil
+			}
+		}
 	} else {
-		zlog.DebugfCtx(ctx, "从redis中查找到数据：%v", f)
+		zlog.InfofCtx(ctx, "redis中找到数据 %v", value)
 		return nil
 	}
-	err = f.Where().Find(f).Error
-	if err != nil {
-		zlog.InfofCtx(ctx, "数据库中没有数据")
-		return err
-	}
-	zlog.DebugfCtx(ctx, "从数据库中查找到数据：%v", f)
-	err = global.Rdb.HSet(ctx, f.KeyName(), f).Err()
-	if err != nil {
-		zlog.InfofCtx(ctx, "redis中存储数据失败 :%v", err)
-	}
-	return nil
 }
